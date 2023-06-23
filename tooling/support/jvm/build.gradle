@@ -1,0 +1,18 @@
+plugins {
+    id 'square-lib'
+    id 'square-publishing'
+}
+
+dependencies {
+    implementation project(':tooling:support:core')
+    implementation project(':tooling:models')
+
+    compileOnly(gradleApi())
+    compileOnly(libs.kotlin.gradle.plugin.api)
+
+    testImplementation project(':test-support')
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(gradleApi())
+    testImplementation(libs.kotlin.gradle.plugin)
+    testImplementation(libs.sqldelight)
+}

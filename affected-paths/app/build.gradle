@@ -1,0 +1,26 @@
+plugins {
+    id 'square-app'
+}
+
+applicationName = "affected-paths"
+
+application {
+    mainClass = "com.squareup.affected.paths.app.MainKt"
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
+
+dependencies {
+    implementation project(':affected-paths:core')
+
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.picocli.core)
+    implementation(libs.logback.classic)
+    implementation(libs.logback.core)
+    implementation(libs.slf4j.api)
+}

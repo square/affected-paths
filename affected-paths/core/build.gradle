@@ -1,0 +1,16 @@
+plugins {
+    id 'square-lib'
+    id 'square-publishing'
+}
+
+dependencies {
+    api project(':tooling:models')
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.gradle.tooling.api)
+    implementation(libs.jgit.core)
+    implementation(libs.koin.core)
+    implementation(libs.slf4j.api)
+
+    testImplementation(libs.kotlin.test.junit5)
+}

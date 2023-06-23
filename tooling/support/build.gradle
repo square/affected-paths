@@ -1,0 +1,32 @@
+plugins {
+    id 'square-java-gradle'
+}
+
+dependencies {
+    implementation project(':tooling:models')
+    implementation project(':tooling:support:android')
+    implementation project(':tooling:support:core')
+    implementation project(':tooling:support:jvm')
+
+    compileOnly(gradleApi())
+
+    testImplementation project(':test-support')
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(gradleApi())
+    testImplementation(libs.kotlin.gradle.plugin)
+    testImplementation(libs.android.gradle.impl)
+}
+
+gradlePlugin {
+    website = 'https://github.com/squareup/affected-paths'
+    vcsUrl = 'https://github.com/squareup/affected-paths.git'
+    plugins {
+        create("squareToolingPlugin") {
+            id = "com.squareup.tooling"
+            displayName = findProperty("libraryName")?.toString()
+            description = findProperty("description")?.toString()
+            tags.addAll("affected-paths")
+            implementationClass = "com.squareup.tooling.suppport.SquareToolingPlugin"
+        }
+    }
+}

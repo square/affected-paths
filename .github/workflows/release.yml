@@ -1,0 +1,55 @@
+name: Publish a release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+concurrency:
+  group: "release"
+  cancel-in-progress: false
+
+jobs:
+  publish_archives:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+      # https://github.com/gradle/gradle-build-action/issues/561
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+      - name: Set up Java
+        id: setup-java
+        uses: actions/setup-java@v3.11.0
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Assemble in parallel
+        run: ./gradlew build dokkaHtml
+#      - name: Publish the artifacts
+#        env:
+#          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+#          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+#          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}
+#        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-parallel --stacktrace
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.parallel=true -Dorg.gradle.caching=true

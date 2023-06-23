@@ -1,0 +1,2 @@
+*.jar filter=lfs diff=lfs merge=lfs -text
+gradle/wrapper/gradle-wrapper.jar filter=lfs diff=lfs merge=lfs -text
