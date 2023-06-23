@@ -1,0 +1,31 @@
+import org.gradle.api.initialization.resolve.RepositoriesMode
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://repo.gradle.org/gradle/libs-releases' }
+    }
+}
+
+includeBuild('plugins')
+
+rootProject.name = "com.squareup.affected.paths"
+include(':tooling:models')
+include(':tooling:support')
+include(':tooling:support:android')
+include(':tooling:support:core')
+include(':tooling:support:jvm')
+include(':affected-paths:app')
+include(':affected-paths:core')
+include(':test-support')

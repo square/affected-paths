@@ -1,0 +1,69 @@
+[versions]
+kotlin = "1.8.20"
+kotlinDsl = "4.0.14"
+dokka = "1.8.10"
+kotlinx = "1.6.4"
+kotlinSerialization = "1.5.1"
+
+gradleTAPI = "7.4.2"
+
+agp = "7.4.2"
+
+sqldelight = "1.5.4"
+
+picocli = "4.7.0"
+
+slf4j = "2.0.6"
+logback = "1.4.5"
+
+koin = "3.3.0"
+
+jgit = "6.4.0.202211300538-r"
+
+vanniktech = "0.13.0"
+
+[libraries]
+# Plugins
+
+## Kotlin
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
+kotlin-dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
+
+## Gradle
+gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradleTAPI" }
+
+## Publishing
+vanniktech = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech" }
+
+## Android
+android-gradle-impl = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+
+## Picocli
+picocli-core = { module = "info.picocli:picocli", version.ref = "picocli" }
+
+## Logging
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+## SqlDelight
+sqldelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+
+## Dependency Injector
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+
+## JGit
+jgit-core = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+
+## Testing
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+
+[bundles]
+
+[plugins]
+kotlin-plugin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlinDsl" }

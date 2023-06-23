@@ -1,0 +1,7 @@
+plugins {
+    id 'square-lib'
+}
+
+dependencies {
+    implementation(gradleApi())
+}

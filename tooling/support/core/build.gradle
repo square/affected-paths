@@ -1,0 +1,14 @@
+plugins {
+    id 'square-lib'
+    id 'square-publishing'
+}
+
+dependencies {
+    implementation project(':tooling:models')
+
+    compileOnly(gradleApi())
+    compileOnly(libs.kotlin.gradle.plugin.api)
+
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(gradleApi())
+}

@@ -1,0 +1,9 @@
+# Gradle
+.gradle
+build
+/reports
+local.properties
+
+# Idea
+.idea
+*.iml

@@ -1,0 +1,88 @@
+/*
+ * Copyright (c) 2023 Square, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package com.squareup.affected.paths.core
+
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.isDirectory
+
+/**
+ * Common configuration flags used by the [CoreAnalyzer]
+ * and applied to all commands.
+ */
+@Suppress("unused")
+public data class CoreOptions(
+  /** Log Gradle build output */
+  val logGradle: Boolean = false,
+
+  /** Directory of the Gradle build to use */
+  val directory: Path = Path(".").toRealPath(),
+
+  /** The commit to diff against `HEAD` */
+  val comparisonCommit: String = "",
+
+  /**
+   * Enables Gradle debugging. Passes `-Dorg.gradle.debug=true` to the daemon. See also the documentation on
+   * [Gradle Debugging](https://docs.gradle.org/current/userguide/command_line_interface.html#sec:command_line_debugging).
+   */
+  val debugGradle: Boolean = false,
+
+  /**
+   * Allow Gradle to query for models in parallel.
+   * @see org.gradle.tooling.BuildController.getCanQueryProjectModelInParallel
+   */
+  val allowGradleParallel: Boolean = false,
+
+  /** Sets the `-Xms` flag with this value, if not `null`. Value is in MB */
+  val initialGradleMemory: Int? = null,
+
+  /** Sets the `-Xmx` flag with this value, if not `null`. Value is in MB */
+  val maxGradleMemory: Int? = null,
+
+  /** Java VM arguments to use for Gradle Tooling API */
+  val customJvmFlags: List<String> = emptyList(),
+
+  /** Arguments to pass to Gradle command line */
+  val customGradleFlags: List<String> = emptyList(),
+
+  /** List of changed files to evaluate. If empty, internal Git tool is used to determine changed files */
+  val changedFiles: List<String> = emptyList()
+) {
+
+  init {
+    require(directory.isDirectory()) { "Must point to a valid directory" }
+  }
+
+  internal val jvmArgs: List<String> = buildList {
+    addAll(customJvmFlags)
+    if (initialGradleMemory != null) {
+      add("-Xms${initialGradleMemory}M")
+    }
+
+    if (maxGradleMemory != null) {
+      add("-Xmx${maxGradleMemory}M")
+    }
+  }
+
+  internal val gradleArgs: List<String> = buildList {
+    addAll(customGradleFlags)
+    if (debugGradle) {
+      add("-Dorg.gradle.debug=true")
+    }
+  }
+}

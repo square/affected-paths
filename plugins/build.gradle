@@ -1,0 +1,33 @@
+plugins {
+    alias(libs.plugins.kotlin.dsl)
+    alias(libs.plugins.kotlin.plugin)
+}
+
+dependencies {
+    implementation(gradleApi())
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.kotlin.dokka.plugin)
+    implementation(libs.kotlin.serialization.plugin)
+    implementation(libs.vanniktech)
+}
+
+gradlePlugin {
+    plugins {
+        create("publishingPlugin") {
+            id = "square-publishing"
+            implementationClass = "com.squareup.plugins.PublishingPlugin"
+        }
+        create("libPlugin") {
+            id = "square-lib"
+            implementationClass = "com.squareup.plugins.KotlinLibPlugin"
+        }
+        create("appPlugin") {
+            id = "square-app"
+            implementationClass = "com.squareup.plugins.KotlinAppPlugin"
+        }
+        create("javaGradlePlugin") {
+            id = "square-java-gradle"
+            implementationClass = "com.squareup.plugins.JavaGradlePlugin"
+        }
+    }
+}
