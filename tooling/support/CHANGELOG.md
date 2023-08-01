@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## v0.1.0
+- Initial public release
+
 ## v0.0.3
 - Close ServiceLoader stream once all extractors are found
 
