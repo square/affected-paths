@@ -77,12 +77,11 @@ public data class CoreOptions(
     if (maxGradleMemory != null) {
       add("-Xmx${maxGradleMemory}M")
     }
-  }
 
-  internal val gradleArgs: List<String> = buildList {
-    addAll(customGradleFlags)
     if (debugGradle) {
-      add("-Dorg.gradle.debug=true")
+      add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005")
     }
   }
+
+  internal val gradleArgs: List<String> = customGradleFlags.toList()
 }
