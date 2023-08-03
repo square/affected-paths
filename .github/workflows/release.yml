@@ -3,7 +3,7 @@ name: Publish a release
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - '*'
 
@@ -44,12 +44,12 @@ jobs:
 
       - name: Assemble in parallel
         run: ./gradlew build dokkaHtml
-#      - name: Publish the artifacts
-#        env:
-#          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
-#          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
-#          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}
-#        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-parallel --stacktrace
+      - name: Publish the artifacts
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-parallel --stacktrace
 
 env:
   GRADLE_OPTS: -Dorg.gradle.parallel=true -Dorg.gradle.caching=true

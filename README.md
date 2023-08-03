@@ -10,7 +10,7 @@ In order to use the `affected-paths`, the `tooling-support` Gradle plugin must b
 Gradle DSL
 ```groovy
 plugins {
-  id 'com.squareup.tooling' version '0.0.3'
+  id 'com.squareup.tooling' version '0.1.0'
 }
 ```
 
@@ -18,7 +18,7 @@ Legacy
 ```groovy
 buildscript {
   dependencies {
-    classpath "com.squareup.affected.paths:tooling-support:0.0.3"
+    classpath "com.squareup.affected.paths:tooling-support:0.1.0"
   }
 }
 
@@ -45,8 +45,8 @@ git diff between `HEAD` and the commit hash passed in. An example of how to use 
 The `affected-paths` core library can be imported as follows:
 
 ```groovy
-implementation 'com.squareup.affected.paths:affected-paths-core:0.0.3'
-implementation 'com.squareup.affected.paths:tooling-models:0.0.1' // Also needed for interacting with models from core
+implementation 'com.squareup.affected.paths:affected-paths-core:0.1.0'
+implementation 'com.squareup.affected.paths:tooling-models:0.1.0' // Also needed for interacting with models from core
 ```
 
 ## License
