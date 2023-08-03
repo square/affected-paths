@@ -43,7 +43,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Assemble in parallel
-        run: ./gradlew build dokkaHtml
+        run: ./gradlew build
       - name: Publish the artifacts
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
