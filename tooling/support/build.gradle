@@ -26,7 +26,7 @@ gradlePlugin {
             displayName = findProperty("libraryName")?.toString()
             description = findProperty("description")?.toString()
             tags.addAll("affected-paths")
-            implementationClass = "com.squareup.tooling.suppport.SquareToolingPlugin"
+            implementationClass = "com.squareup.tooling.support.SquareToolingPlugin"
         }
     }
 }
