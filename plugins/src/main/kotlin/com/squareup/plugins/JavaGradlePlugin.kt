@@ -31,7 +31,8 @@ class JavaGradlePlugin : Plugin<Project> {
   override fun apply(target: Project) {
     target.apply<KotlinLibPlugin>()
     target.configureJavaGradlePlugin()
-    target.configureDokka()
+    // Disabled until https://github.com/Kotlin/dokka/issues/2612 is resolved
+    // target.configureDokka()
   }
 }
 

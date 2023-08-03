@@ -29,6 +29,7 @@ class PublishingPlugin : Plugin<Project> {
 
   override fun apply(target: Project) {
     target.apply<MavenPublishPlugin>()
-    target.configureDokka()
+    // Disabled until https://github.com/Kotlin/dokka/issues/2612 is resolved
+    // target.configureDokka()
   }
 }
