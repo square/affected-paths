@@ -32,7 +32,7 @@ class JavaGradlePlugin : Plugin<Project> {
     target.apply<KotlinLibPlugin>()
     target.configureJavaGradlePlugin()
     // Disabled until https://github.com/Kotlin/dokka/issues/2612 is resolved
-//    target.configureDokka()
+    // target.configureDokka()
   }
 }
 
