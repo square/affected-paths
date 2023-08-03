@@ -27,6 +27,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.Platform
+import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin
@@ -34,11 +35,12 @@ import org.jetbrains.kotlin.gradle.utils.notCompatibleWithConfigurationCacheComp
 import java.io.File
 
 internal fun Project.configureDokka() {
-  val dokka = tasks.getByName<DokkaTask>("dokkaHtml") {
+  apply<DokkaPlugin>()
+  tasks.getByName<DokkaTask>("dokkaHtml") {
     notCompatibleWithConfigurationCacheCompat("https://github.com/Kotlin/dokka/issues/1217")
 
     // All projects should have the library name to use set in the project's gradle.properties file
-    moduleName.set(findProperty("libraryName")?.toString())
+    moduleName.set(findProperty("POM_NAME")?.toString())
     dokkaSourceSets.maybeCreate("main").apply {
       outputDirectory.set(layout.buildDirectory.dir("dokka").get().asFile)
       reportUndocumented.set(true)

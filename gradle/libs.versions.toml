@@ -1,8 +1,8 @@
 [versions]
-kotlin = "1.8.20"
-kotlinDsl = "4.0.14"
-dokka = "1.8.10"
-kotlinx = "1.6.4"
+kotlin = "1.9.0"
+kotlinDsl = "4.1.1"
+dokka = "1.8.20"
+kotlinx = "1.7.3"
 kotlinSerialization = "1.5.1"
 
 gradleTAPI = "7.4.2"
@@ -20,7 +20,7 @@ koin = "3.3.0"
 
 jgit = "6.4.0.202211300538-r"
 
-vanniktech = "0.13.0"
+vanniktech = "0.25.3"
 
 [libraries]
 # Plugins
