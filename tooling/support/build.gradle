@@ -26,7 +26,7 @@ gradlePlugin {
             displayName = findProperty("POM_NAME")?.toString()
             description = findProperty("POM_DESCRIPTION")?.toString()
             tags.addAll("affected-paths")
-            implementationClass = "com.squareup.tooling.suppport.SquareToolingPlugin"
+            implementationClass = "com.squareup.tooling.support.SquareToolingPlugin"
         }
     }
 }
