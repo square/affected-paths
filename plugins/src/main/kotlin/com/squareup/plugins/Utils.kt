@@ -40,7 +40,7 @@ internal fun Project.configureDokka() {
     notCompatibleWithConfigurationCacheCompat("https://github.com/Kotlin/dokka/issues/1217")
 
     // All projects should have the library name to use set in the project's gradle.properties file
-    moduleName.set(findProperty("POM_NAME")?.toString())
+    moduleName.set(findProperty("POM_NAME").toString())
     dokkaSourceSets.maybeCreate("main").apply {
       outputDirectory.set(layout.buildDirectory.dir("dokka").get().asFile)
       reportUndocumented.set(true)

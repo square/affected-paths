@@ -18,13 +18,13 @@ dependencies {
 }
 
 gradlePlugin {
-    website = findProperty("POM_URL")?.toString()
-    vcsUrl = findProperty("POM_SCM_URL")?.toString()
+    website = findProperty("POM_URL").toString()
+    vcsUrl = findProperty("POM_SCM_URL").toString()
     plugins {
         squareToolingPlugin {
             id = "com.squareup.tooling"
-            displayName = findProperty("POM_NAME")?.toString()
-            description = findProperty("POM_DESCRIPTION")?.toString()
+            displayName = findProperty("POM_NAME").toString()
+            description = findProperty("POM_DESCRIPTION").toString()
             tags.addAll("affected-paths")
             implementationClass = "com.squareup.tooling.support.SquareToolingPlugin"
         }
