@@ -17,6 +17,7 @@
 
 package com.squareup.affected.paths.core
 
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.isDirectory
@@ -26,7 +27,7 @@ import kotlin.io.path.isDirectory
  * and applied to all commands.
  */
 @Suppress("unused")
-public data class CoreOptions(
+public data class CoreOptions @JvmOverloads constructor(
   /** Log Gradle build output */
   val logGradle: Boolean = false,
 
@@ -61,7 +62,10 @@ public data class CoreOptions(
   val customGradleFlags: List<String> = emptyList(),
 
   /** List of changed files to evaluate. If empty, internal Git tool is used to determine changed files */
-  val changedFiles: List<String> = emptyList()
+  val changedFiles: List<String> = emptyList(),
+
+  /** Auto-injects the "com.squareup.tooling" plugin to all projects in the build */
+  val autoInjectPlugin: Boolean = true
 ) {
 
   init {
@@ -83,5 +87,32 @@ public data class CoreOptions(
     }
   }
 
-  internal val gradleArgs: List<String> = customGradleFlags.toList()
+  internal val gradleArgs: List<String> = buildList {
+    if (autoInjectPlugin) {
+      add("-I")
+      add(
+        File.createTempFile("tempScript", ".gradle").apply {
+          writeText(
+            """
+                allprojects {
+                  buildscript {
+                    repositories {
+                      mavenCentral()
+                    }
+                    dependencies {
+                      classpath "com.squareup.affected.paths:tooling-support:0.1.0"
+                    }
+                  }
+                  
+                  afterEvaluate { p ->
+                    p.apply plugin: "com.squareup.tooling"
+                  }
+                }
+            """.trimIndent()
+          )
+          deleteOnExit()
+        }.absolutePath
+      )
+    }
+  }
 }
