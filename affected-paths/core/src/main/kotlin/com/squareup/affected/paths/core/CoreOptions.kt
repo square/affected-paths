@@ -94,20 +94,21 @@ public data class CoreOptions @JvmOverloads constructor(
         File.createTempFile("tempScript", ".gradle").apply {
           writeText(
             """
-                allprojects {
-                  buildscript {
-                    repositories {
-                      mavenCentral()
-                    }
-                    dependencies {
-                      classpath "com.squareup.affected.paths:tooling-support:0.1.0"
-                    }
+              beforeProject { project ->
+                project.buildscript {
+                  repositories {
+                    mavenCentral()
                   }
-                  
-                  afterEvaluate { p ->
-                    p.apply plugin: "com.squareup.tooling"
+                  dependencies {
+                    classpath "com.squareup.affected.paths:tooling-support:0.1.0"
                   }
                 }
+              }
+              afterProject { project ->
+                if (!project.plugins.hasPlugin("com.squareup.tooling")) {
+                  project.apply plugin: "com.squareup.tooling"
+                }
+              }
             """.trimIndent()
           )
           deleteOnExit()
