@@ -48,12 +48,12 @@ The affected-paths library can be found on [MavenCentral][1]:
 ### Gradle
 Groovy
 ```groovy
-implementation 'com.squareup.affected.paths:affected-paths-core:0.1.0'
+implementation 'com.squareup.affected.paths:affected-paths-core:0.1.1'
 ```
 
 Kotlin
 ```kotlin
-implementation("com.squareup.affected.paths:affected-paths-core:0.1.0")
+implementation("com.squareup.affected.paths:affected-paths-core:0.1.1")
 ```
 
 ### Maven
@@ -61,7 +61,7 @@ implementation("com.squareup.affected.paths:affected-paths-core:0.1.0")
 <dependency>
   <groupId>com.squareup.affected.paths</groupId>
   <artifactId>affected-paths-core</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 
@@ -123,7 +123,7 @@ If the auto-inject flag is disabled, the tooling plugin will have to be applied 
 Gradle DSL
 ```groovy
 plugins {
-  id 'com.squareup.tooling' version '0.1.0'
+  id 'com.squareup.tooling' version '0.1.1'
 }
 ```
 
@@ -131,14 +131,12 @@ Legacy
 ```groovy
 buildscript {
   dependencies {
-    classpath "com.squareup.affected.paths:tooling-support:0.1.0"
+    classpath "com.squareup.affected.paths:tooling-support:0.1.1"
   }
 }
 
 apply plugin: "com.squareup.tooling"
 ```
-
-**WARNING:** Do not apply the plugin if the auto-inject flag is enabled. The analysis will fail due to the same plugin being applied twice.
 
 ## License
 ```

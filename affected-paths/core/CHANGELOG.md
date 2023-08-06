@@ -1,6 +1,8 @@
 # Affected-Paths Core
 
 ## Unreleased
+
+## v0.1.1
 - Adds `autoInjectPlugin` flag to `CoreOptions`, which auto-injects the "com.squareup.tooling" plugin to the build
 
 ## v0.1.0
