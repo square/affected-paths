@@ -42,10 +42,9 @@ private class SquareProjectModelBuilderImpl : SquareProjectModelBuilder {
     return modelName == SquareProject::class.java.name
   }
 
-  override fun buildAll(modelName: String, project: Project): Any {
+  override fun buildAll(modelName: String, project: Project): Any? {
     if (modelName == SquareProject::class.java.name) {
       return extractors.firstNotNullOfOrNull { it.extractSquareProject(project) }
-        ?: throw IllegalArgumentException("No known plugin used (should be Android or Java)")
     }
 
     // If this is used for any other project types, or for some other model type,

@@ -105,4 +105,11 @@ internal class BaseConfigurationOptions {
   )
   var maxGradleMemory: Int? = null
     internal set
+
+  @Option(
+    names = ["--inject-plugin"],
+    description = ["Injects the \"com.squareup.tooling\" plugin to all projects in the build"]
+  )
+  var autoInject: Boolean = false
+    internal set
 }

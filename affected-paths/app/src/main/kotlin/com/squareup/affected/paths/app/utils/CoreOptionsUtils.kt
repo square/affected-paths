@@ -30,6 +30,7 @@ internal fun BaseConfigurationOptions.toCoreOptions(): CoreOptions {
     initialGradleMemory = initialGradleMemory,
     maxGradleMemory = maxGradleMemory,
     customJvmFlags = listOf("-XX:-MaxFDLimit"),
-    customGradleFlags = listOf("--stacktrace")
+    customGradleFlags = listOf("--stacktrace"),
+    autoInjectPlugin = autoInject
   )
 }
