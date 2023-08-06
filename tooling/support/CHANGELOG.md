@@ -1,6 +1,8 @@
 # Tooling-Support
 
 ## Unreleased
+
+## v0.1.1
 - Fix crash from `SquareProjectModelBuilder` when used on a non-Java/Android project 
 
 ## v0.1.0
