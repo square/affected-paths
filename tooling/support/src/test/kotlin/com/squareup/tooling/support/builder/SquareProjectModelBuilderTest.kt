@@ -24,6 +24,7 @@ import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareDependency
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertContains
@@ -288,15 +289,13 @@ class SquareProjectModelBuilderTest {
   }
 
   @Test
-  fun `Ensure no plugins throws exception`() {
+  fun `Do not throw exception if a non-Java or non-Android plugin is used`() {
     val projectModelBuilder = SquareProjectModelBuilder()
 
     val project = ProjectBuilder.builder().build()
 
-    val exception = assertFailsWith<IllegalArgumentException> {
+    assertDoesNotThrow {
       projectModelBuilder.buildAll(SquareProject::class.java.name, project)
     }
-
-    assertEquals("No known plugin used (should be Android or Java)", exception.message)
   }
 }
