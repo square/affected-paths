@@ -1,11 +1,124 @@
 # Affected-Paths
 
-Affected-Paths is a Gradle specific tool that allows parsing Gradle builds and identifies all projects affected
-(directly and indirectly) given a list of file changes between two git commits.
+Affected-Paths is a Java library that utilizes the Gradle Tooling API to parse Gradle based projects and identifies all modules affected
+(directly and indirectly) given the file changes from git.
 
-## Getting Started
+## Quick Demo
 
-In order to use the `affected-paths`, the `tooling-support` Gradle plugin must be applied to every project `build.gradle`.
+To get started quickly with the demo app, first build the distribution of it:
+```shell
+./gradlew :affected-paths:app:installDist
+```
+
+Once the distribution has been built, the demo app can be run on a given project by calling:
+```shell
+./affected-paths/app/build/install/affected-paths/bin/affected-paths --log-gradle --inject-plugin --dir=/path/to/project
+```
+
+**Note:** Affected-Paths will only work on:
+- Projects that are version controlled **AND**
+- Contain at least 1 JVM or Android module (apply either `java` or `android-*` plugins)
+
+This should output something similar to this:
+```text
+Changed file: app/src/main/kotlin/com/example/Main.kt
+Projects affected by this changed file:
+    - :app
+    - :app:debug:debugAndroidTest
+    - :app:debug:debugUnitTest
+    - :app:release:releaseUnitTest
+
+
+Changed file: library/src/main/kotlin/com/example/Library.kt
+Projects affected by this changed file:
+    - :app
+    - :app:debug:debugAndroidTest
+    - :app:debug:debugUnitTest
+    - :app:release:releaseUnitTest
+    - :library
+    - :library:debug:debugAndroidTest
+    - :library:debug:debugUnitTest
+    - :library:release:releaseUnitTest
+
+```
+
+## Usage
+The affected-paths library can be found on [MavenCentral][1]:
+
+### Gradle
+Groovy
+```groovy
+implementation 'com.squareup.affected.paths:affected-paths-core:0.1.0'
+```
+
+Kotlin
+```kotlin
+implementation("com.squareup.affected.paths:affected-paths-core:0.1.0")
+```
+
+### Maven
+```xml
+<dependency>
+  <groupId>com.squareup.affected.paths</groupId>
+  <artifactId>affected-paths-core</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
+**NOTE:** The affected-paths library is a Kotlin first project, so it uses [Kotlin Coroutines][2].
+
+A simple use case that outputs all affected project paths:
+
+```kotlin
+val coreAnalyzer = CoreAnalyzer()
+
+suspend fun getSquareProjects(): List<String> {
+    // Performs analysis of files changed between HEAD and the previous commit
+    val analysisResult = coreAnalyzer.analyze()
+    
+    // Flattens each project path found in each result
+    return analysisResult.affectedResults.flatMap { it.affectedProjectPaths }
+}
+```
+
+The `CoreAnalyzer` class can be passed a `CoreOptions` object, that provides extra configuration for analysis:
+
+```kotlin
+import kotlin.io.path.Path
+
+val coreAnalyzer = CoreAnalyzer(
+    coreOptions = CoreOptions(
+        // Output all the Gradle logs
+        logGradle = true,
+
+        // If the JVM is run from a different directory, pass in the project path
+        directory = Path("path/to/project"),
+
+        // The SHA-1 hash of the commit to compare against the current HEAD
+        comparisonCommit = "abcd1234"
+        
+        // Alternatively, a list of files can be passed to be used for analysis
+        // changedFiles = list("file1.kt", "path/to/file2.kt")
+    )
+)
+```
+
+## How this works
+
+Internally, the affected-paths library uses JGit to find the files changed between commits, and the Gradle Tooling API to configure and gather the `SquareProject` models, which are then analyzed by the `CoreAnalyzer` to provide the `AnalysisResult`.
+
+The Gradle Tooling API cannot normally gather the `SquareProject` models, unless a [`ToolingModelBuilder`][3] (which defines how to construct the models) is registered on each module. A tooling plugin that registers the `SquareProjectModelBuilder` is automatically applied by `CoreAnalyzer` on all projects during the analysis, but can be disabled from `CoreOptions` as follows:
+
+```kotlin
+val analyzer = CoreAnalyzer(
+    options = CoreOptions(
+        // Disable auto-injecting the tooling plugin
+        autoInjectPlugin = false
+    )
+)
+```
+
+If the auto-inject flag is disabled, the tooling plugin will have to be applied manually for each project that should be analyzed:
 
 Gradle DSL
 ```groovy
@@ -25,29 +138,7 @@ buildscript {
 apply plugin: "com.squareup.tooling"
 ```
 
-This plugin provides a [ToolingModelBuilder][1] that allows a JVM app using the `affected-paths` library to analyze the project.
-
-## Demo
-
-Once the above plugin has been applied, the following command can be called to run the demo app that will print an example analysis output:
-
-```shell
-./gradlew :affected-paths:app:run --args="--dir=/path/to/project"
-```
-
-The output from this demo will display the list of files changed from the project's current and previous commits, as well as all the projects, variants, and tests affected by these files.
-
-## Affected-Paths Core Usage
-
-With this plugin, the `affected-paths` core library can be used to query and analyze all projects and determine if they are affected given the
-git diff between `HEAD` and the commit hash passed in. An example of how to use this core library can be found in [BaseCommand.kt][2].
-
-The `affected-paths` core library can be imported as follows:
-
-```groovy
-implementation 'com.squareup.affected.paths:affected-paths-core:0.1.0'
-implementation 'com.squareup.affected.paths:tooling-models:0.1.0' // Also needed for interacting with models from core
-```
+**WARNING:** Do not apply the plugin if the auto-inject flag is enabled. The analysis will fail due to the same plugin being applied twice.
 
 ## License
 ```
@@ -66,5 +157,6 @@ implementation 'com.squareup.affected.paths:tooling-models:0.1.0' // Also needed
    limitations under the License.
 ```
 
-[1]:https://docs.gradle.org/current/javadoc/org/gradle/tooling/provider/model/ToolingModelBuilder.html
-[2]:affected-paths/app/src/main/kotlin/com/squareup/affected/paths/app/commands/BaseCommand.kt
+[1]:https://search.maven.org/artifact/com.squareup.affected.paths/affected-paths-core
+[2]:https://github.com/Kotlin/kotlinx.coroutines
+[3]:https://docs.gradle.org/current/javadoc/org/gradle/tooling/provider/model/ToolingModelBuilder.html
