@@ -32,6 +32,7 @@ kotlin-dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx" }
 
 ## Gradle
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradleTAPI" }
