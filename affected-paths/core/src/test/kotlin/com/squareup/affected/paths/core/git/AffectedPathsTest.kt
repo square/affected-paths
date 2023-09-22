@@ -4,7 +4,9 @@ import com.squareup.affected.paths.core.CoreAnalyzer
 import com.squareup.affected.paths.core.CoreOptions
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.time.Duration.Companion.minutes
@@ -12,10 +14,10 @@ import kotlin.time.Duration.Companion.minutes
 class AffectedPathsTest {
 
     @TempDir
-    lateinit var root: File
+    lateinit var root: Path
 
     @Test
-    fun `Basic affected paths test`() = runTest(timeout = 3.minutes) {
+    fun `Can find affected project with single file change`() = runTest(timeout = 3.minutes) {
         // Prep
         createSettingsFile(
             rootDir = root,
@@ -55,7 +57,7 @@ class AffectedPathsTest {
         // Test
         val analyzer = CoreAnalyzer(
             CoreOptions(
-                directory = root.toPath(),
+                directory = root,
                 changedFiles = listOf("app/build.gradle")
             )
         )
@@ -69,10 +71,10 @@ class AffectedPathsTest {
     }
 
     @Test
-    fun `Included builds test`() = runTest(timeout = 3.minutes) {
+    fun `Can find projects from included builds by default`() = runTest(timeout = 3.minutes) {
         // Prep
-        val build1 = File(root, "build1").apply { mkdirs() }
-        val build2 = File(build1, "build2").apply { mkdirs() }
+        val build1 = root.resolve("build1").createDirectories()
+        val build2 = build1.resolve("build2").createDirectories()
         createSettingsFile(
             rootDir = build1,
             contents = """
@@ -130,7 +132,7 @@ class AffectedPathsTest {
 
         val analyzer = CoreAnalyzer(
             CoreOptions(
-                directory = build1.toPath(),
+                directory = build1,
                 changedFiles = listOf("library/build.gradle")
             )
         )
@@ -142,10 +144,10 @@ class AffectedPathsTest {
     }
 
     @Test
-    fun `Do not use included builds test`() = runTest(timeout = 3.minutes) {
+    fun `Ignores projects in included builds when useIncludeBuild is false`() = runTest(timeout = 3.minutes) {
         // Prep
-        val build1 = File(root, "build1").apply { mkdirs() }
-        val build2 = File(build1, "build2").apply { mkdirs() }
+        val build1 = root.resolve("build1").createDirectories()
+        val build2 = build1.resolve("build2").createDirectories()
         createSettingsFile(
             rootDir = build1,
             contents = """
@@ -203,7 +205,7 @@ class AffectedPathsTest {
 
         val analyzer = CoreAnalyzer(
             CoreOptions(
-                directory = build1.toPath(),
+                directory = build1,
                 changedFiles = listOf("library/build.gradle"),
                 useIncludeBuild = false
             )
@@ -216,10 +218,10 @@ class AffectedPathsTest {
     }
 
     @Test
-    fun `Included builds with dependency substitution test`() = runTest(timeout = 3.minutes) {
+    fun `Can find affected projects owned by included builds given a changed file`() = runTest(timeout = 3.minutes) {
         // Prep
-        val build1 = File(root, "build1").apply { mkdirs() }
-        val build2 = File(build1, "build2").apply { mkdirs() }
+        val build1 = root.resolve("build1").createDirectories()
+        val build2 = build1.resolve("build2").createDirectories()
         createSettingsFile(
             rootDir = build1,
             contents = """
@@ -282,7 +284,7 @@ class AffectedPathsTest {
 
         val analyzer = CoreAnalyzer(
             CoreOptions(
-                directory = build1.toPath(),
+                directory = build1,
                 changedFiles = listOf("build2/foobar/build.gradle")
             )
         )
@@ -293,18 +295,15 @@ class AffectedPathsTest {
         assertContentEquals(listOf("build2/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
-    private fun createSettingsFile(rootDir: File, contents: String) {
-        File(rootDir, "settings.gradle").apply {
-            createNewFile()
+    private fun createSettingsFile(rootDir: Path, contents: String) {
+        rootDir.resolve("settings.gradle").apply {
             writeText(contents)
         }
     }
 
-    private fun createModule(rootDir: File, name: String, contents: String): File {
-        return File(rootDir, name).apply {
-            mkdirs()
-            File(this, "build.gradle").apply {
-                createNewFile()
+    private fun createModule(rootDir: Path, name: String, contents: String): Path {
+        return rootDir.resolve(name).createDirectories().apply {
+            resolve("build.gradle").apply {
                 writeText(contents)
             }
         }
