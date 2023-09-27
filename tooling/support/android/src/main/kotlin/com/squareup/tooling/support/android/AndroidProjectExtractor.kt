@@ -21,6 +21,8 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.models.SquareTestConfiguration
+import com.squareup.tooling.support.core.extractors.relativePathToRootBuild
+import com.squareup.tooling.support.core.extractors.relativePathToRootProject
 import com.squareup.tooling.support.core.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareVariantConfiguration
 import org.gradle.api.Project
@@ -38,8 +40,8 @@ internal fun Project.extractAppModuleProject(): SquareProject {
   return SquareProject(
     name = name,
     pluginUsed = "android-app",
-    namespace = group.toString(),
-    pathToProject = projectDir.toRelativeString(rootDir),
+    namespace = rootProject.name,
+    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
     // Variants and configurations are different things. Should really be split.
     variants = appExtension.applicationVariants.associate { variant ->
       val (srcs, deps) = variant.extractSquareVariantConfigurationParams(this, sourceIndex)
@@ -71,8 +73,8 @@ internal fun Project.extractLibraryModuleProject(): SquareProject {
   return SquareProject(
     name = name,
     pluginUsed = "android-library",
-    namespace = group.toString(),
-    pathToProject = projectDir.toRelativeString(rootDir),
+    namespace = rootProject.name,
+    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
     variants = libraryExtension.libraryVariants.associate { variant ->
       val (srcs, deps) = variant.extractSquareVariantConfigurationParams(this, sourceIndex)
       val tests = buildMap<String, SquareTestConfiguration> {

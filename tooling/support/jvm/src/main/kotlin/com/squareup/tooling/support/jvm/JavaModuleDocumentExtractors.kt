@@ -20,6 +20,8 @@ package com.squareup.tooling.support.jvm
 import com.squareup.tooling.models.SquareDependency
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.models.SquareTestConfiguration
+import com.squareup.tooling.support.core.extractors.relativePathToRootBuild
+import com.squareup.tooling.support.core.extractors.relativePathToRootProject
 import com.squareup.tooling.support.core.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareVariantConfiguration
 import org.gradle.api.Project
@@ -58,8 +60,8 @@ internal fun Project.extractJavaModuleProject(): SquareProject {
   return SquareProject(
     name = name,
     pluginUsed = "jvm",
-    namespace = group.toString(),
-    pathToProject = projectDir.toRelativeString(rootDir),
+    namespace = rootProject.name,
+    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
     variants = variants.mapValues { (key, pair) ->
       val (srcs, deps) = pair
       SquareVariantConfiguration(
