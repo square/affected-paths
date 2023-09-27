@@ -33,9 +33,9 @@ jobs:
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
       - name: Build and test tooling
-        run: ./gradlew --no-daemon --profile --stacktrace -p tooling build test
+        run: ./gradlew --no-daemon --profile --stacktrace -PRELEASE_SIGNING_ENABLED=false -p tooling publishToMavenLocal build test
       - name: Build and test affected-paths
-        run: ./gradlew --no-daemon --profile --stacktrace -p affected-paths build test
+        run: ./gradlew --no-daemon --profile --stacktrace -PRELEASE_SIGNING_ENABLED=false -p affected-paths publishToMavenLocal build test
 
 env:
   GRADLE_OPTS: -Dorg.gradle.parallel=true -Dorg.gradle.caching=true

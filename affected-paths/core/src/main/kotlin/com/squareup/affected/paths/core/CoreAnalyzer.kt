@@ -84,7 +84,12 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
 
           ensureActive()
 
-          val actionExecutor = projectConnector.action(SquareBuildAction(coreOptions.allowGradleParallel))
+          val actionExecutor = projectConnector.action(
+            SquareBuildAction(
+              coreOptions.allowGradleParallel,
+              coreOptions.useIncludeBuild
+            )
+          )
           actionExecutor.withCancellationToken(cancellationTokenSource.token())
           actionExecutor.addArguments(coreOptions.gradleArgs)
           actionExecutor.addJvmArguments(coreOptions.jvmArgs)
@@ -101,7 +106,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
         }
 
         val affectedResultsDeferred = async(Dispatchers.Default) {
-          projectsDeferred.await().findAffectedPaths(changedFilesDeferred.await())
+          findAffectedPaths(projectsDeferred.await(), changedFilesDeferred.await())
         }
 
         // Cancel the Gradle build if the coroutine was cancelled
