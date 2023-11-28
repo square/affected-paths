@@ -1,6 +1,9 @@
 ## Unreleased
+
+## v0.1.2
 - `affected-paths-core`, `tooling-support-*`: Add in support for composite builds being analyzed
 - `affected-paths-core`: Remove filter of root project
+- `affected-paths-core`: Fix improper project mapping for file changes in nested projects
 
 ## v0.1.1
 - `tooling-support`: Fix crash from `SquareProjectModelBuilder` when used on a non-Java/Android project
