@@ -295,6 +295,71 @@ class AffectedPathsTest {
         assertContentEquals(listOf("build2/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
+    @Test
+    fun `Proper project is mapped for nested projects`() = runTest(timeout = 3.minutes) {
+        // Prep
+        val build = root.resolve("build").createDirectories()
+        createSettingsFile(
+            rootDir = build,
+            contents = """
+                rootProject.name = 'blah'
+                include ':app'
+                include ':library'
+                include ':library:foobar'
+            """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "app",
+            contents =
+            """
+                plugins {
+                    id 'application'
+                }
+                
+                dependencies {
+                    implementation(':library:foobar')
+                    implementation('com.squareup:blah:0.0.1')
+                }
+                """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "library",
+            contents =
+            """
+                plugins {
+                    id 'java'
+                }
+                """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "library/foobar",
+            contents =
+            """
+                plugins {
+                    id 'java'
+                }
+                """.trimIndent()
+        )
+
+        val analyzer = CoreAnalyzer(
+            CoreOptions(
+                directory = build,
+                changedFiles = listOf("library/foobar/build.gradle")
+            )
+        )
+
+        val result = analyzer.analyze()
+
+        assertContentEquals(listOf("app", "library", "library/foobar"), result.projectMap.keys)
+        assertContentEquals(listOf("library/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+    }
+
     private fun createSettingsFile(rootDir: Path, contents: String) {
         rootDir.resolve("settings.gradle").apply {
             writeText(contents)
