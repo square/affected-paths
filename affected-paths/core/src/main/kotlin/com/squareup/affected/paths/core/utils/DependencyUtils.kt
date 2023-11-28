@@ -117,10 +117,11 @@ private fun filesToProjects(
   val fileToDocsMap = hashMapOf<String, MutableSet<SquareProject>>()
   val list = changedFiles.mapNotNull { file ->
     val modulePath = arrayListOf<String>()
-    val doc = file.trim('/').split('/').firstNotNullOfOrNull { element ->
+    val docSet = file.trim('/').split('/').mapNotNull docSet@ { element ->
       modulePath.add(element)
-      return@firstNotNullOfOrNull projects[modulePath.joinToString("/")]
-    } ?: return@mapNotNull null
+      return@docSet projects[modulePath.joinToString("/")]
+    }
+    val doc = docSet.lastOrNull() ?: return@mapNotNull null
     return@mapNotNull file to doc
   }
 
