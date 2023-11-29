@@ -29,16 +29,26 @@ import kotlinx.coroutines.launch
 /*
  * Finds all the affected paths of the list of Square Projects with the given list of changed files
  */
-internal suspend fun List<SquareProject>.findAffectedPaths(
+internal suspend fun findAffectedPaths(
+  projectList: List<SquareProject>,
   changedFiles: List<String>
 ): List<AffectedResult> {
   return coroutineScope {
-    val slices = async(Dispatchers.Default) { getReverseDependencies() }
-    val filesToDocs = async(Dispatchers.Default) {
-      filesToProjects(changedFiles, associateBy { it.pathToProject })
+    // Separate the projects to their distinct builds
+    val projectsMappedToBuilds =  buildMap<String, MutableList<SquareProject>> {
+      projectList.forEach {
+        val list = getOrPut(it.namespace) { arrayListOf() }
+        list.add(it)
+      }
     }
 
-    return@coroutineScope findAffectedAddresses(slices.await(), filesToDocs.await())
+    return@coroutineScope projectsMappedToBuilds.flatMap { (_, projects) ->
+      val slices = async(Dispatchers.Default) { projects.getReverseDependencies() }
+      val filesToDocs = async(Dispatchers.Default) {
+        filesToProjects(changedFiles, projects.associateBy { it.pathToProject })
+      }
+      return@flatMap findAffectedAddresses(slices.await(), filesToDocs.await())
+    }
   }
 }
 
@@ -107,10 +117,11 @@ private fun filesToProjects(
   val fileToDocsMap = hashMapOf<String, MutableSet<SquareProject>>()
   val list = changedFiles.mapNotNull { file ->
     val modulePath = arrayListOf<String>()
-    val doc = file.trim('/').split('/').firstNotNullOfOrNull { element ->
+    val docSet = file.trim('/').split('/').mapNotNull docSet@ { element ->
       modulePath.add(element)
-      return@firstNotNullOfOrNull projects[modulePath.joinToString("/")]
-    } ?: return@mapNotNull null
+      return@docSet projects[modulePath.joinToString("/")]
+    }
+    val doc = docSet.lastOrNull() ?: return@mapNotNull null
     return@mapNotNull file to doc
   }
 

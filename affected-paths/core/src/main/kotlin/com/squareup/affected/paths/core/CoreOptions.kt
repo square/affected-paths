@@ -65,7 +65,13 @@ public data class CoreOptions @JvmOverloads constructor(
   val changedFiles: List<String> = emptyList(),
 
   /** Auto-injects the "com.squareup.tooling" plugin to all projects in the build */
-  val autoInjectPlugin: Boolean = true
+  val autoInjectPlugin: Boolean = true,
+
+  /** Include any "includeBuild" builds from the current build */
+  val useIncludeBuild: Boolean = true,
+
+  /** Pass in a custom Gradle installation, instead of using the build distribution */
+  val gradleInstallationPath: Path? = null,
 ) {
 
   init {
@@ -97,10 +103,11 @@ public data class CoreOptions @JvmOverloads constructor(
               beforeProject { project ->
                 project.buildscript {
                   repositories {
+                    mavenLocal()
                     mavenCentral()
                   }
                   dependencies {
-                    classpath "com.squareup.affected.paths:tooling-support:0.1.1"
+                    classpath "com.squareup.affected.paths:tooling-support:0.1.2"
                   }
                 }
               }

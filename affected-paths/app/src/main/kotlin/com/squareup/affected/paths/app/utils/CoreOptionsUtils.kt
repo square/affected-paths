@@ -31,6 +31,8 @@ internal fun BaseConfigurationOptions.toCoreOptions(): CoreOptions {
     maxGradleMemory = maxGradleMemory,
     customJvmFlags = listOf("-XX:-MaxFDLimit"),
     customGradleFlags = listOf("--stacktrace"),
-    autoInjectPlugin = autoInject
+    autoInjectPlugin = autoInject,
+    changedFiles = changedFiles,
+    gradleInstallationPath = gradleInstallationPath,
   )
 }

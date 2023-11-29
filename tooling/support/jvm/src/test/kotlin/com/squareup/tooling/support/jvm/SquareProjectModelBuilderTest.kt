@@ -56,7 +56,7 @@ class SquareProjectModelBuilderTest {
     val result = projectExtractor.extractSquareProject(appProject)
     val expected = SquareProject(
       name = "app",
-      namespace = "com.squareup.test",
+      namespace = "com.squareup",
       pathToProject = "test/app",
       pluginUsed = "jvm",
       variants = mapOf(
