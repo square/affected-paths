@@ -1,5 +1,9 @@
 # Affected-Paths
 
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/square/affected-paths/test.yml)
+![Maven Central](https://img.shields.io/maven-central/v/com.squareup.affected.paths/affected-paths-core)
+![GitHub](https://img.shields.io/github/license/square/affected-paths)
+
 Affected-Paths is a Java library that utilizes the Gradle Tooling API to parse Gradle based projects and identifies all modules affected
 (directly and indirectly) given the file changes from git.
 
@@ -48,12 +52,12 @@ The affected-paths library can be found on [MavenCentral][1]:
 ### Gradle
 Groovy
 ```groovy
-implementation 'com.squareup.affected.paths:affected-paths-core:0.1.1'
+implementation 'com.squareup.affected.paths:affected-paths-core:<<latest>>'
 ```
 
 Kotlin
 ```kotlin
-implementation("com.squareup.affected.paths:affected-paths-core:0.1.1")
+implementation("com.squareup.affected.paths:affected-paths-core:<<latest>>")
 ```
 
 ### Maven
@@ -61,7 +65,7 @@ implementation("com.squareup.affected.paths:affected-paths-core:0.1.1")
 <dependency>
   <groupId>com.squareup.affected.paths</groupId>
   <artifactId>affected-paths-core</artifactId>
-  <version>0.1.1</version>
+  <version>*latest*</version>
 </dependency>
 ```
 
@@ -123,7 +127,7 @@ If the auto-inject flag is disabled, the tooling plugin will have to be applied 
 Gradle DSL
 ```groovy
 plugins {
-  id 'com.squareup.tooling' version '0.1.1'
+  id 'com.squareup.tooling' version '<<latest>>'
 }
 ```
 
@@ -131,7 +135,7 @@ Legacy
 ```groovy
 buildscript {
   dependencies {
-    classpath "com.squareup.affected.paths:tooling-support:0.1.1"
+    classpath "com.squareup.affected.paths:tooling-support:<<latest>>"
   }
 }
 

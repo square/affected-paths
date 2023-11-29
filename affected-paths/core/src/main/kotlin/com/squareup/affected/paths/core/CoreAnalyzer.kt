@@ -77,14 +77,24 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
         val projectsDeferred = projects?.let { CompletableDeferred(it) } ?: async(Dispatchers.IO) {
           ensureActive() // In case this is cancelled before start
 
-          val projectConnector = affectedPathsApplication.koin.get<GradleConnector>()
-            .forProjectDirectory(rootDir.toFile())
-            .useBuildDistribution()
-            .connect()
+          val projectConnector = with(affectedPathsApplication.koin.get<GradleConnector>()) {
+            forProjectDirectory(rootDir.toFile())
+            if (coreOptions.gradleInstallationPath != null) {
+              useInstallation(coreOptions.gradleInstallationPath.toFile())
+            } else {
+              useBuildDistribution()
+            }
+            return@with connect()
+          }
 
           ensureActive()
 
-          val actionExecutor = projectConnector.action(SquareBuildAction(coreOptions.allowGradleParallel))
+          val actionExecutor = projectConnector.action(
+            SquareBuildAction(
+              coreOptions.allowGradleParallel,
+              coreOptions.useIncludeBuild
+            )
+          )
           actionExecutor.withCancellationToken(cancellationTokenSource.token())
           actionExecutor.addArguments(coreOptions.gradleArgs)
           actionExecutor.addJvmArguments(coreOptions.jvmArgs)
@@ -101,7 +111,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
         }
 
         val affectedResultsDeferred = async(Dispatchers.Default) {
-          projectsDeferred.await().findAffectedPaths(changedFilesDeferred.await())
+          findAffectedPaths(projectsDeferred.await(), changedFilesDeferred.await())
         }
 
         // Cancel the Gradle build if the coroutine was cancelled
