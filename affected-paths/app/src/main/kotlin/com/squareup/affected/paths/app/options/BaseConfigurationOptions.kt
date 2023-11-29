@@ -112,4 +112,18 @@ internal class BaseConfigurationOptions {
   )
   var autoInject: Boolean = false
     internal set
+
+  @Option(
+    names = ["--changed-files"],
+    description = ["List of changed files to use instead of the Git diff"]
+  )
+  var changedFiles: List<String> = emptyList()
+    internal set
+
+  @Option(
+    names = ["--gradle-installation-path"],
+    description = ["Use a custom Gradle installation"]
+  )
+  var gradleInstallationPath: Path? = null
+    internal set
 }

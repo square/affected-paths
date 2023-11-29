@@ -69,6 +69,9 @@ public data class CoreOptions @JvmOverloads constructor(
 
   /** Include any "includeBuild" builds from the current build */
   val useIncludeBuild: Boolean = true,
+
+  /** Pass in a custom Gradle installation, instead of using the build distribution */
+  val gradleInstallationPath: Path? = null,
 ) {
 
   init {
