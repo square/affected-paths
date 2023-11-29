@@ -77,7 +77,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
         val projectsDeferred = projects?.let { CompletableDeferred(it) } ?: async(Dispatchers.IO) {
           ensureActive() // In case this is cancelled before start
 
-          val projectConnector = with(affectedPathsApplication.koin.get<GradleConnector>()) {
+          val projectConnection = with(affectedPathsApplication.koin.get<GradleConnector>()) {
             forProjectDirectory(rootDir.toFile())
             if (coreOptions.gradleInstallationPath != null) {
               useInstallation(coreOptions.gradleInstallationPath.toFile())
@@ -89,7 +89,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
 
           ensureActive()
 
-          val actionExecutor = projectConnector.action(
+          val actionExecutor = projectConnection.action(
             SquareBuildAction(
               coreOptions.allowGradleParallel,
               coreOptions.useIncludeBuild
