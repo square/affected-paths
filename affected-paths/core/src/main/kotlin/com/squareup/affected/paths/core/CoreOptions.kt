@@ -94,6 +94,7 @@ public data class CoreOptions @JvmOverloads constructor(
   }
 
   internal val gradleArgs: List<String> = buildList {
+    addAll(customGradleFlags)
     if (autoInjectPlugin) {
       add("-I")
       add(
