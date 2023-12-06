@@ -52,7 +52,7 @@ internal fun Project.extractAppModuleProject(): SquareProject {
         variant.unitTestVariant?.let {
           put(it.name, it.extractSquareTestConfiguration(this@extractAppModuleProject))
         }
-      }
+      }.toMap()
       variant.name to SquareVariantConfiguration(
         srcs = srcs,
         deps = deps,
@@ -84,7 +84,7 @@ internal fun Project.extractLibraryModuleProject(): SquareProject {
         variant.unitTestVariant?.let {
           put(it.name, it.extractSquareTestConfiguration(this@extractLibraryModuleProject))
         }
-      }
+      }.toMap()
       variant.name to SquareVariantConfiguration(
         srcs = srcs,
         deps = deps,

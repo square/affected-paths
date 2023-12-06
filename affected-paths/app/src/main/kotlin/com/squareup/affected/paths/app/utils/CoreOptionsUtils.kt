@@ -30,7 +30,7 @@ internal fun BaseConfigurationOptions.toCoreOptions(): CoreOptions {
     initialGradleMemory = initialGradleMemory,
     maxGradleMemory = maxGradleMemory,
     customJvmFlags = listOf("-XX:-MaxFDLimit"),
-    customGradleFlags = listOf("--stacktrace"),
+    customGradleFlags = listOf("--stacktrace", "-Dorg.gradle.unsafe.isolated-projects=true", "--configuration-cache-problems=warn", "-Dorg.gradle.unsafe.configuration-cache.max-problems=2000"),
     autoInjectPlugin = autoInject,
     changedFiles = changedFiles,
     gradleInstallationPath = gradleInstallationPath,

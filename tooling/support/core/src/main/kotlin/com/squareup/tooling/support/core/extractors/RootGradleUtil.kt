@@ -1,8 +1,8 @@
 package com.squareup.tooling.support.core.extractors
 
 import org.gradle.api.Project
+import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
-import org.gradle.invocation.DefaultGradle
 
 /**
  * Gets the root Gradle build, if one exists.
@@ -16,7 +16,7 @@ public fun Gradle.getRootGradle(): Gradle {
  * Otherwise, returns `null`.
  */
 public fun Project.relativePathToRootBuild(): String? {
-    val buildRootFile = (gradle.getRootGradle() as DefaultGradle).owner.buildRootDir
+    val buildRootFile = (gradle.getRootGradle() as GradleInternal).owner.buildRootDir
     return projectDir.relativeToOrNull(buildRootFile)?.path
 }
 
