@@ -18,8 +18,10 @@
 package com.squareup.tooling.support.builder
 
 import com.squareup.tooling.models.SquareProject
+import com.squareup.tooling.models.SquareProjectParameters
 import com.squareup.tooling.support.core.extractors.SquareProjectExtractor
 import org.gradle.api.Project
+import org.gradle.tooling.provider.model.ParameterizedToolingModelBuilder
 import org.gradle.tooling.provider.model.ToolingModelBuilder
 
 /**
@@ -27,7 +29,7 @@ import org.gradle.tooling.provider.model.ToolingModelBuilder
  *
  * @see [ToolingModelBuilder]
  */
-public interface SquareProjectModelBuilder : ToolingModelBuilder
+public interface SquareProjectModelBuilder : ParameterizedToolingModelBuilder<SquareProjectParameters>
 
 // Hide the implementation and expose only a helper function
 @JvmSynthetic
@@ -42,6 +44,18 @@ private class SquareProjectModelBuilderImpl : SquareProjectModelBuilder {
     return modelName == SquareProject::class.java.name
   }
 
+  override fun buildAll(modelName: String, parameter: SquareProjectParameters, project: Project): Any? {
+    if (modelName == SquareProject::class.java.name) {
+      return extractors.firstNotNullOfOrNull { it.extractSquareProject(project, parameter.gitRoot) }
+    }
+
+    // If this is used for any other project types, or for some other model type,
+    // furiously throw an error and not a desk
+    throw IllegalArgumentException(
+      "Unknown model $modelName found, expected ${SquareProject::class.java.name}"
+    )
+  }
+
   override fun buildAll(modelName: String, project: Project): Any? {
     if (modelName == SquareProject::class.java.name) {
       return extractors.firstNotNullOfOrNull { it.extractSquareProject(project) }
@@ -52,5 +66,9 @@ private class SquareProjectModelBuilderImpl : SquareProjectModelBuilder {
     throw IllegalArgumentException(
       "Unknown model $modelName found, expected ${SquareProject::class.java.name}"
     )
+  }
+
+  override fun getParameterType(): Class<SquareProjectParameters> {
+    return SquareProjectParameters::class.java
   }
 }

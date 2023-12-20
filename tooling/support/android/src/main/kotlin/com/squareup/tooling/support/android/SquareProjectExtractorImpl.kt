@@ -24,13 +24,13 @@ import org.gradle.api.Project
 // Android SquareProject extractor
 internal class SquareProjectExtractorImpl : SquareProjectExtractor {
 
-  override fun extractSquareProject(project: Project): SquareProject? {
+  override fun extractSquareProject(project: Project, gitRoot: String?): SquareProject? {
     return when {
       // Android app plugin logic
-      project.plugins.hasPlugin("com.android.application") -> project.extractAppModuleProject()
+      project.plugins.hasPlugin("com.android.application") -> project.extractAppModuleProject(gitRoot)
 
       // Android library plugin logic
-      project.plugins.hasPlugin("com.android.library") -> project.extractLibraryModuleProject()
+      project.plugins.hasPlugin("com.android.library") -> project.extractLibraryModuleProject(gitRoot)
 
       else -> null
     }

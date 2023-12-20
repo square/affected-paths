@@ -21,7 +21,6 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.models.SquareTestConfiguration
-import com.squareup.tooling.support.core.extractors.relativePathToRootBuild
 import com.squareup.tooling.support.core.extractors.relativePathToRootProject
 import com.squareup.tooling.support.core.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareVariantConfiguration
@@ -32,7 +31,7 @@ import org.gradle.api.Project
  */
 // Using a separate function due to minor differences between the app and library extensions
 // that can't be reconciled with a generic function
-internal fun Project.extractAppModuleProject(): SquareProject {
+internal fun Project.extractAppModuleProject(gitRoot: String?): SquareProject {
   val appExtension = requireNotNull(extensions.findByType(AppExtension::class.java))
   // Gets the sources defined in the extension
   val sourceIndex = appExtension.sourceIndexExtractor()
@@ -41,7 +40,7 @@ internal fun Project.extractAppModuleProject(): SquareProject {
     name = name,
     pluginUsed = "android-app",
     namespace = rootProject.name,
-    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
+    pathToProject = relativePathToRootProject(gitRoot),
     // Variants and configurations are different things. Should really be split.
     variants = appExtension.applicationVariants.associate { variant ->
       val (srcs, deps) = variant.extractSquareVariantConfigurationParams(this, sourceIndex)
@@ -65,7 +64,7 @@ internal fun Project.extractAppModuleProject(): SquareProject {
 /**
  * Extracts a [SquareProject] using the Android [LibraryExtension].
  */
-internal fun Project.extractLibraryModuleProject(): SquareProject {
+internal fun Project.extractLibraryModuleProject(gitRoot: String?): SquareProject {
   val libraryExtension = requireNotNull(extensions.findByType(LibraryExtension::class.java))
   // Gets the sources defined in the extension
   val sourceIndex = libraryExtension.sourceIndexExtractor()
@@ -74,7 +73,7 @@ internal fun Project.extractLibraryModuleProject(): SquareProject {
     name = name,
     pluginUsed = "android-library",
     namespace = rootProject.name,
-    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
+    pathToProject = relativePathToRootProject(gitRoot),
     variants = libraryExtension.libraryVariants.associate { variant ->
       val (srcs, deps) = variant.extractSquareVariantConfigurationParams(this, sourceIndex)
       val tests = buildMap<String, SquareTestConfiguration> {

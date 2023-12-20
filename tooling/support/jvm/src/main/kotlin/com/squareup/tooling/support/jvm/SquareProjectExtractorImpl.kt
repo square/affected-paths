@@ -24,10 +24,10 @@ import org.gradle.api.Project
 // Jvm SquareProject extractor
 internal class SquareProjectExtractorImpl : SquareProjectExtractor {
 
-  override fun extractSquareProject(project: Project): SquareProject? {
+  override fun extractSquareProject(project: Project, gitRoot: String?): SquareProject? {
     return when {
       // Java plugin logic
-      project.plugins.hasPlugin("org.gradle.java-base") -> project.extractJavaModuleProject()
+      project.plugins.hasPlugin("org.gradle.java-base") -> project.extractJavaModuleProject(gitRoot)
 
       else -> null
     }

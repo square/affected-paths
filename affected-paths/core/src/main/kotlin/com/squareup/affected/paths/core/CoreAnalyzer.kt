@@ -36,6 +36,7 @@ import org.koin.core.KoinApplication
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import java.nio.file.Path
+import kotlin.io.path.pathString
 
 /**
  * This performs an analysis with the given [SquareProject] to determine affected paths
@@ -69,7 +70,16 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
           }
         }
 
-        val rootDir = affectedPathsApplication.koin.get<Path>()
+        val gradleBuildRoot = affectedPathsApplication.koin.get<Path>()
+
+        val workingRoot = try {
+          // Try to get the working (git) root...
+          affectedPathsApplication.koin.get<SquareGit>().gitRootPath
+        } catch (e: Throwable) {
+          // else get the gradle build root passed in
+          gradleBuildRoot.pathString
+        }
+
         /*
          * Since the Gradle Tooling API is run from a different process, run all TAPIs on the IO
          * dispatcher.
@@ -78,7 +88,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
           ensureActive() // In case this is cancelled before start
 
           val projectConnection = with(affectedPathsApplication.koin.get<GradleConnector>()) {
-            forProjectDirectory(rootDir.toFile())
+            forProjectDirectory(gradleBuildRoot.toFile())
             if (coreOptions.gradleInstallationPath != null) {
               useInstallation(coreOptions.gradleInstallationPath.toFile())
             } else {
@@ -92,7 +102,8 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
           val actionExecutor = projectConnection.action(
             SquareBuildAction(
               coreOptions.allowGradleParallel,
-              coreOptions.useIncludeBuild
+              coreOptions.useIncludeBuild,
+              workingRoot
             )
           )
           actionExecutor.withCancellationToken(cancellationTokenSource.token())

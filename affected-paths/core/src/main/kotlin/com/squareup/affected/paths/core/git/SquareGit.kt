@@ -40,6 +40,10 @@ import java.nio.file.Path
 internal interface SquareGit {
 
   /**
+   * Gets the git repository root path
+   */
+  val gitRootPath: String
+  /**
    * Gets the name of the current branch, a sha-1 hash, or empty string
    *
    * @see org.eclipse.jgit.lib.Repository.getBranch
@@ -88,6 +92,9 @@ internal class SquareGitImpl(
 
   // If comparisonCommit is empty, force it to be headId instead
   private val comparisonMergeBaseId = repository.resolve(comparisonCommit) ?: headId
+
+  override val gitRootPath: String
+    get() = repository.workTree.path
 
   override val currentBranch: String
     get() = repository.branch ?: ""

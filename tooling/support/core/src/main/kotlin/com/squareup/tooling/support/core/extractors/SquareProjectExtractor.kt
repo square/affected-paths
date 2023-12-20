@@ -34,7 +34,7 @@ public interface SquareProjectExtractor {
   /**
    * Extract the [SquareProject] from the given [Project]. May return `null` if nothing can be extracted.
    */
-  public fun extractSquareProject(project: Project): SquareProject?
+  public fun extractSquareProject(project: Project, rootDir: String? = null): SquareProject?
 
   public companion object {
 

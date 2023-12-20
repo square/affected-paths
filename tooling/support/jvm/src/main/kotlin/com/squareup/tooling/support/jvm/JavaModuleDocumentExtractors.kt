@@ -20,7 +20,6 @@ package com.squareup.tooling.support.jvm
 import com.squareup.tooling.models.SquareDependency
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.models.SquareTestConfiguration
-import com.squareup.tooling.support.core.extractors.relativePathToRootBuild
 import com.squareup.tooling.support.core.extractors.relativePathToRootProject
 import com.squareup.tooling.support.core.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareVariantConfiguration
@@ -34,7 +33,7 @@ private val baseAndroidVariants = listOf("debug", "release")
 /**
  * Extracts a [SquareProject] from the [org.gradle.api.plugins.JavaBasePlugin]
  */
-internal fun Project.extractJavaModuleProject(): SquareProject {
+internal fun Project.extractJavaModuleProject(gitRoot: String?): SquareProject {
   val ssc = extensions.findByType(SourceSetContainer::class.java).orEmpty()
   val tests = linkedMapOf<String, MutableList<SquareTestConfiguration>>()
   val variants = linkedMapOf<String, Pair<Set<String>, Set<SquareDependency>>>()
@@ -61,7 +60,7 @@ internal fun Project.extractJavaModuleProject(): SquareProject {
     name = name,
     pluginUsed = "jvm",
     namespace = rootProject.name,
-    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
+    pathToProject = relativePathToRootProject(gitRoot),
     variants = variants.mapValues { (key, pair) ->
       val (srcs, deps) = pair
       SquareVariantConfiguration(

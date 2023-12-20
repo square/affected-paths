@@ -20,14 +20,20 @@
 package com.squareup.affected.paths.core.utils
 
 import com.squareup.tooling.models.SquareProject
+import com.squareup.tooling.models.SquareProjectParameters
 import org.gradle.tooling.BuildAction
 import org.gradle.tooling.BuildController
 import org.gradle.tooling.model.Model
 
 // Build action to grab the SquareProject on a per-project basis
-private class ProjectBuildAction(private val project: Model) : BuildAction<SquareProject?> {
+private class ProjectBuildAction(
+  private val project: Model,
+  private val rootDir: String
+) : BuildAction<SquareProject?> {
   override fun execute(controller: BuildController): SquareProject? {
-    return controller.findModel(project, SquareProject::class.java)
+    return controller.findModel(project, SquareProject::class.java, SquareProjectParameters::class.java) {
+      it.gitRoot = rootDir
+    }
   }
 }
 
@@ -37,6 +43,7 @@ private class ProjectBuildAction(private val project: Model) : BuildAction<Squar
 internal class SquareBuildAction(
   private val allowParallelConfiguration: Boolean,
   private val useIncludeBuild: Boolean,
+  private val rootDir: String
 ) : BuildAction<List<SquareProject>> {
   override fun execute(controller: BuildController): List<SquareProject> {
     // Run the ProjectBuildAction in parallel, if we can
@@ -50,7 +57,7 @@ internal class SquareBuildAction(
             build.projects // All projects included in the "settings.gradle" file of all builds
               .asSequence()
               .map { project ->
-                return@map ProjectBuildAction(project)
+                return@map ProjectBuildAction(project, rootDir)
               }
           )
         }
@@ -62,7 +69,7 @@ internal class SquareBuildAction(
           .projects // All projects included in the "settings.gradle" file
           .asSequence()
           .map { project ->
-            return@map ProjectBuildAction(project)
+            return@map ProjectBuildAction(project, rootDir)
           }.toList()
       )
     }
