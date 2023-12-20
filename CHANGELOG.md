@@ -1,5 +1,6 @@
 ## Unreleased
 - `affected-paths-core`: Fix custom Gradle flags not being properly set
+- `tooling-support-core` : Fix issue where Kotlin plugin could be applied in project, but API dependency is missing
 
 ## v0.1.2
 - `affected-paths-core`, `tooling-support-*`: Add in support for composite builds being analyzed

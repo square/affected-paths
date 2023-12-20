@@ -5,9 +5,9 @@ plugins {
 
 dependencies {
     implementation project(':tooling:models')
+    implementation(libs.kotlin.gradle.plugin.api)
 
     compileOnly(gradleApi())
-    compileOnly(libs.kotlin.gradle.plugin.api)
 
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(gradleApi())
