@@ -360,6 +360,93 @@ class AffectedPathsTest {
         assertContentEquals(listOf("library/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
+    @Test
+    fun `Namespace doesn't result in wrong affected-results`() = runTest(timeout = 3.minutes) {
+        // Prep
+        val build = root.resolve("build").createDirectories()
+        createSettingsFile(
+            rootDir = build,
+            contents = """
+                rootProject.name = 'blah'
+                include ':app'
+                include ':library'
+                include ':library:foobar'
+                include ':feature:bar'
+            """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "app",
+            contents =
+            """
+                plugins {
+                    id 'application'
+                }
+                
+                dependencies {
+                    implementation(':library')
+                }
+                """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "library",
+            contents =
+            """
+                plugins {
+                    id 'java'
+                }
+                
+                dependencies {
+                    implementation(':library:foobar')
+                }
+                """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "library/foobar",
+            contents =
+            """
+                plugins {
+                    id 'java'
+                }
+                
+                dependencies {
+                    implementation(':feature:bar')
+                }
+                """.trimIndent()
+        )
+
+        createModule(
+            rootDir = build,
+            name = "feature/bar",
+            contents =
+            """
+                plugins {
+                    id 'java'
+                }
+                """.trimIndent()
+        )
+
+        val analyzer = CoreAnalyzer(
+            CoreOptions(
+                directory = build,
+                changedFiles = listOf("feature/bar/build.gradle")
+            )
+        )
+
+        val result = analyzer.analyze()
+
+        println(result.projectMap.flatMap { it.value.variants.values.flatMap { it.deps } })
+        println(result.affectedResults)
+
+//        assertContentEquals(listOf("app", "library", "library/foobar"), result.projectMap.keys)
+//        assertContentEquals(listOf("library/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+    }
+
     private fun createSettingsFile(rootDir: Path, contents: String) {
         rootDir.resolve("settings.gradle").apply {
             writeText(contents)
