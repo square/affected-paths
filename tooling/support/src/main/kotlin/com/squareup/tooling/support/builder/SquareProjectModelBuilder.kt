@@ -42,9 +42,11 @@ private class SquareProjectModelBuilderImpl : SquareProjectModelBuilder {
     return modelName == SquareProject::class.java.name
   }
 
-  override fun buildAll(modelName: String, project: Project): Any? {
+  override fun buildAll(modelName: String, project: Project): Any {
     if (modelName == SquareProject::class.java.name) {
-      return extractors.firstNotNullOfOrNull { it.extractSquareProject(project) }
+      return requireNotNull(extractors.firstNotNullOfOrNull { it.extractSquareProject(project) }) {
+        "No known ${SquareProject::class.java.name} found for project ${project.path}"
+      }
     }
 
     // If this is used for any other project types, or for some other model type,

@@ -32,6 +32,9 @@ internal class SquareProjectExtractorImpl : SquareProjectExtractor {
       // Android library plugin logic
       project.plugins.hasPlugin("com.android.library") -> project.extractLibraryModuleProject()
 
+      // Android test plugin logic
+      project.plugins.hasPlugin("com.android.test") -> project.extractTestModuleProject()
+
       else -> null
     }
   }
