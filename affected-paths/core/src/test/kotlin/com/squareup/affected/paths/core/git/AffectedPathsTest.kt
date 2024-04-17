@@ -38,7 +38,7 @@ class AffectedPathsTest {
                 }
                 
                 dependencies {
-                    implementation(':library')
+                    implementation project(':library')
                 }
                 """.trimIndent()
         )
@@ -95,7 +95,7 @@ class AffectedPathsTest {
                 }
                 
                 dependencies {
-                    implementation(':library')
+                    implementation project(':library')
                 }
                 """.trimIndent()
         )
@@ -140,7 +140,7 @@ class AffectedPathsTest {
         val result = analyzer.analyze()
 
         assertContentEquals(listOf("build2/foobar", "app", "library"), result.projectMap.keys)
-        assertContentEquals(listOf("library"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+        assertContentEquals(listOf("app", "app:debug:debugUnitTest", "library", "app:release:releaseUnitTest"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
     @Test
@@ -168,7 +168,7 @@ class AffectedPathsTest {
                 }
                 
                 dependencies {
-                    implementation(':library')
+                    implementation project(':library')
                 }
                 """.trimIndent()
         )
@@ -214,7 +214,7 @@ class AffectedPathsTest {
         val result = analyzer.analyze()
 
         assertContentEquals(listOf("app", "library"), result.projectMap.keys)
-        assertContentEquals(listOf("library"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+        assertContentEquals(listOf("app", "app:debug:debugUnitTest", "library", "app:release:releaseUnitTest"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
     @Test
@@ -246,7 +246,7 @@ class AffectedPathsTest {
                 }
                 
                 dependencies {
-                    implementation(':library')
+                    implementation project(':library')
                     implementation('com.squareup:blah:0.0.1')
                 }
                 """.trimIndent()
@@ -319,7 +319,7 @@ class AffectedPathsTest {
                 }
                 
                 dependencies {
-                    implementation(':library:foobar')
+                    implementation project(':library:foobar')
                     implementation('com.squareup:blah:0.0.1')
                 }
                 """.trimIndent()
@@ -357,7 +357,7 @@ class AffectedPathsTest {
         val result = analyzer.analyze()
 
         assertContentEquals(listOf("app", "library", "library/foobar"), result.projectMap.keys)
-        assertContentEquals(listOf("library/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+        assertContentEquals(listOf("app", "app:debug:debugUnitTest", "library/foobar", "app:release:releaseUnitTest"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
     }
 
     private fun createSettingsFile(rootDir: Path, contents: String) {
