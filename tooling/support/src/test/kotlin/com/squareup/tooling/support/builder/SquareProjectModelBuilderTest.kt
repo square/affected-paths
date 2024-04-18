@@ -20,6 +20,7 @@ package com.squareup.tooling.support.builder
 import com.squareup.test.support.forceEvaluate
 import com.squareup.test.support.generateApplicationBuild
 import com.squareup.test.support.generateLibraryBuild
+import com.squareup.test.support.generateTestBuild
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.support.core.models.SquareDependency
 import org.gradle.testfixtures.ProjectBuilder
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -286,6 +286,59 @@ class SquareProjectModelBuilderTest {
       releaseUnitTest.srcs.containsAll(listOf("src/test/resources", "src/test/java"))
     }
     assertTrue(releaseUnitTest.deps.isEmpty())
+  }
+
+  @Test
+  fun `Ensure android test constructs SquareProject`() {
+    val projectModelBuilder = SquareProjectModelBuilder()
+
+    val rootProject = ProjectBuilder
+      .builder()
+      .withProjectDir(temporaryFolder)
+      .withName("com.squareup.test")
+      .build()
+
+    val libProject = ProjectBuilder
+      .builder()
+      .withName("test-lib")
+      .withProjectDir(generateTestBuild(File(rootProject.projectDir, "lib")))
+      .withParent(rootProject)
+      .build()
+
+    // Add in the ":app" project
+    ProjectBuilder
+      .builder()
+      .withName("app")
+      .withProjectDir(generateApplicationBuild(File(rootProject.projectDir, "app")))
+      .withParent(rootProject)
+      .build()
+
+    val expectedTestDependency = SquareDependency("/app", setOf("transitive"))
+
+    libProject.forceEvaluate()
+
+    val result = projectModelBuilder.buildAll(SquareProject::class.java.name, libProject) as SquareProject
+
+    // Check SquareProject properties
+    assertEquals("test-lib", result.name)
+    assertEquals("com.squareup.test", result.namespace)
+    assertEquals("lib", result.pathToProject)
+    assertEquals("android-test", result.pluginUsed)
+
+    // Check variant properties
+    assertTrue(result.variants.keys.containsAll(listOf("debug")))
+    val debugVariant = requireNotNull(result.variants["debug"])
+    assertTrue {
+      debugVariant.srcs.containsAll(
+        ANDROID_SRC_DIRECTORY_PATHS.map { "src/debug/$it" } +
+                ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
+      )
+    }
+    assertTrue(debugVariant.deps.contains(expectedTestDependency))
+
+    // Check test variant properties
+    val debugTestVariants = debugVariant.tests
+    assertTrue(debugTestVariants.keys.isEmpty())
   }
 
   @Test

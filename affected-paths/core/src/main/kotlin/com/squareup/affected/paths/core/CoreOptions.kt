@@ -94,6 +94,7 @@ public data class CoreOptions @JvmOverloads constructor(
   }
 
   internal val gradleArgs: List<String> = buildList {
+    addAll(customGradleFlags)
     if (autoInjectPlugin) {
       add("-I")
       add(
@@ -107,7 +108,7 @@ public data class CoreOptions @JvmOverloads constructor(
                     mavenCentral()
                   }
                   dependencies {
-                    classpath "com.squareup.affected.paths:tooling-support:0.1.2"
+                    classpath "com.squareup.affected.paths:tooling-support:0.1.3"
                   }
                 }
               }

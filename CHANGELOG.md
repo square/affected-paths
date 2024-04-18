@@ -1,5 +1,9 @@
 ## Unreleased
 
+## v0.1.3
+- `affected-paths-core`: Fix custom Gradle flags not being properly set
+- `tooling-support-android`: Evaluate projects with `com.android.test` plugin
+
 ## v0.1.2
 - `affected-paths-core`, `tooling-support-*`: Add in support for composite builds being analyzed
 - `affected-paths-core`: Remove filter of root project
