@@ -1,4 +1,6 @@
 ## Unreleased
+
+## v0.1.3
 - `affected-paths-core`: Fix custom Gradle flags not being properly set
 - `tooling-support-android`: Evaluate projects with `com.android.test` plugin
 
