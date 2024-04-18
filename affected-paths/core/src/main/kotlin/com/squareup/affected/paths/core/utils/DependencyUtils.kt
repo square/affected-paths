@@ -34,21 +34,12 @@ internal suspend fun findAffectedPaths(
   changedFiles: List<String>
 ): List<AffectedResult> {
   return coroutineScope {
-    // Separate the projects to their distinct builds
-    val projectsMappedToBuilds =  buildMap<String, MutableList<SquareProject>> {
-      projectList.forEach {
-        val list = getOrPut(it.namespace) { arrayListOf() }
-        list.add(it)
-      }
-    }
 
-    return@coroutineScope projectsMappedToBuilds.flatMap { (_, projects) ->
-      val slices = async(Dispatchers.Default) { projects.getReverseDependencies() }
-      val filesToDocs = async(Dispatchers.Default) {
-        filesToProjects(changedFiles, projects.associateBy { it.pathToProject })
-      }
-      return@flatMap findAffectedAddresses(slices.await(), filesToDocs.await())
+    val slices = async(Dispatchers.Default) { projectList.getReverseDependencies() }
+    val filesToDocs = async(Dispatchers.Default) {
+      filesToProjects(changedFiles, projectList.associateBy { it.pathToProject })
     }
+    return@coroutineScope findAffectedAddresses(slices.await(), filesToDocs.await())
   }
 }
 
