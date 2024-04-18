@@ -115,7 +115,8 @@ internal class BaseConfigurationOptions {
 
   @Option(
     names = ["--changed-files"],
-    description = ["List of changed files to use instead of the Git diff"]
+    description = ["List of changed files to use instead of the Git diff"],
+    split = " "
   )
   var changedFiles: List<String> = emptyList()
     internal set

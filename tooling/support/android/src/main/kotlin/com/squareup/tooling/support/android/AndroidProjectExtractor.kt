@@ -19,6 +19,7 @@ package com.squareup.tooling.support.android
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
 import com.squareup.tooling.models.SquareProject
 import com.squareup.tooling.models.SquareTestConfiguration
 import com.squareup.tooling.support.core.extractors.relativePathToRootBuild
@@ -83,6 +84,39 @@ internal fun Project.extractLibraryModuleProject(): SquareProject {
         }
         variant.unitTestVariant?.let {
           put(it.name, it.extractSquareTestConfiguration(this@extractLibraryModuleProject))
+        }
+      }
+      variant.name to SquareVariantConfiguration(
+        srcs = srcs,
+        deps = deps,
+        tests = tests
+      )
+    }
+  )
+}
+
+/**
+ * Extracts a [SquareProject] using the Android [TestExtension].
+ */
+internal fun Project.extractTestModuleProject(): SquareProject {
+  val testExtension = requireNotNull(extensions.findByType(TestExtension::class.java))
+
+  // Gets the sources defined in the extension
+  val sourceIndex = testExtension.sourceIndexExtractor()
+
+  return SquareProject(
+    name = name,
+    pluginUsed = "android-test",
+    namespace = rootProject.name,
+    pathToProject = relativePathToRootBuild() ?: relativePathToRootProject(),
+    variants = testExtension.applicationVariants.associate { variant ->
+      val (srcs, deps) = variant.extractSquareVariantConfigurationParams(this, sourceIndex)
+      val tests = buildMap<String, SquareTestConfiguration> {
+        variant.testVariant?.let {
+          put(it.name, it.extractSquareTestConfiguration(this@extractTestModuleProject))
+        }
+        variant.unitTestVariant?.let {
+          put(it.name, it.extractSquareTestConfiguration(this@extractTestModuleProject))
         }
       }
       variant.name to SquareVariantConfiguration(

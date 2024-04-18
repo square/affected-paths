@@ -94,6 +94,40 @@ class SquareProjectModelBuilderTest {
   }
 
   @Test
+  fun `Ensure android test constructs SquareProject`() {
+    val projectExtractor = SquareProjectExtractorImpl()
+
+    val rootProject = ProjectBuilder
+      .builder()
+      .withName("com.squareup")
+      .build()
+
+    val childProject = ProjectBuilder
+      .builder()
+      .withName("test")
+      .withParent(rootProject)
+      .build()
+
+    val testProject = ProjectBuilder
+      .builder()
+      .withName("lib")
+      .withParent(childProject)
+      .build()
+
+    testProject.plugins.apply("com.android.test")
+
+    val result = projectExtractor.extractSquareProject(testProject)
+    val expected = SquareProject(
+      name = "lib",
+      namespace = "com.squareup",
+      pathToProject = "test/lib",
+      pluginUsed = "android-test",
+      variants = emptyMap()
+    )
+    assertEquals(expected, result)
+  }
+
+  @Test
   fun `Ensure no plugins returns null`() {
     val projectExtractor = SquareProjectExtractorImpl()
 

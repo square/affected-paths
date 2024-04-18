@@ -108,7 +108,7 @@ public data class CoreOptions @JvmOverloads constructor(
                     mavenCentral()
                   }
                   dependencies {
-                    classpath "com.squareup.affected.paths:tooling-support:0.1.2"
+                    classpath "com.squareup.affected.paths:tooling-support:0.1.3"
                   }
                 }
               }
