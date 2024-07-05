@@ -127,4 +127,11 @@ internal class BaseConfigurationOptions {
   )
   var gradleInstallationPath: Path? = null
     internal set
+
+  @Option(
+    names = ["--build-scan"],
+    description = ["Capture the Gradle build scan"]
+  )
+  var gradleBuildScan: Boolean = false
+    internal set
 }

@@ -96,6 +96,9 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
             )
           )
           actionExecutor.withCancellationToken(cancellationTokenSource.token())
+          if (coreOptions.useBuildScan) {
+            actionExecutor.forTasks(emptyList())
+          }
           actionExecutor.addArguments(coreOptions.gradleArgs)
           actionExecutor.addJvmArguments(coreOptions.jvmArgs)
 

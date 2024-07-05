@@ -72,6 +72,14 @@ public data class CoreOptions @JvmOverloads constructor(
 
   /** Pass in a custom Gradle installation, instead of using the build distribution */
   val gradleInstallationPath: Path? = null,
+
+  /**
+   * Add the build scan flag to the tooling.
+   *
+   * **Note**: This will cause the default tasks of a build to run.
+   */
+
+  val useBuildScan: Boolean = false,
 ) {
 
   init {
@@ -122,6 +130,9 @@ public data class CoreOptions @JvmOverloads constructor(
           deleteOnExit()
         }.absolutePath
       )
+    }
+    if (useBuildScan) {
+      add("--scan")
     }
   }
 }
