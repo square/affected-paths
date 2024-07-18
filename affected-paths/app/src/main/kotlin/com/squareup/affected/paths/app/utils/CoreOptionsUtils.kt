@@ -34,5 +34,6 @@ internal fun BaseConfigurationOptions.toCoreOptions(): CoreOptions {
     autoInjectPlugin = autoInject,
     changedFiles = changedFiles,
     gradleInstallationPath = gradleInstallationPath,
+    useBuildScan = gradleBuildScan
   )
 }
