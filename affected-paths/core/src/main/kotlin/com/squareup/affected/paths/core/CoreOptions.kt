@@ -70,8 +70,25 @@ public data class CoreOptions @JvmOverloads constructor(
   /** Include any "includeBuild" builds from the current build */
   val useIncludeBuild: Boolean = true,
 
-  /** Pass in a custom Gradle installation, instead of using the build distribution */
+  /** Gradle distribution file to use */
+  val gradleDistributionPath: Path? = null,
+
+  /**
+   * Pass in a custom Gradle installation, instead of using the build distribution
+   *
+   * **NOTE**: This will override `gradleDistributionPath` if used.
+   */
   val gradleInstallationPath: Path? = null,
+
+  /**
+   * Gradle version to use for the current build
+   *
+   * **NOTE**: This will override `gradleInstallationPath` and `gradleDistributionPath` if used.
+   */
+  val gradleVersion: String? = null,
+
+  /** Gradle user home directory to use */
+  val gradleUserHome: Path? = null,
 
   /**
    * Add the build scan flag to the tooling.
