@@ -79,10 +79,21 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
 
           val projectConnection = with(affectedPathsApplication.koin.get<GradleConnector>()) {
             forProjectDirectory(rootDir.toFile())
-            if (coreOptions.gradleInstallationPath != null) {
-              useInstallation(coreOptions.gradleInstallationPath.toFile())
-            } else {
-              useBuildDistribution()
+            when {
+              coreOptions.gradleDistributionPath != null -> {
+                useDistribution(coreOptions.gradleDistributionPath.toUri())
+              }
+              coreOptions.gradleInstallationPath != null -> {
+                useInstallation(coreOptions.gradleInstallationPath.toFile())
+              }
+              coreOptions.gradleVersion != null -> {
+                useGradleVersion(coreOptions.gradleVersion)
+              }
+              else -> useBuildDistribution()
+            }
+
+            if (coreOptions.gradleUserHome != null) {
+              useGradleUserHomeDir(coreOptions.gradleUserHome.toFile())
             }
             return@with connect()
           }
