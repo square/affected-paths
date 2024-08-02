@@ -53,7 +53,11 @@ class VariantExtractorsTest {
       "All source paths must be relative to the project dir"
     )
     assertEquals(24, srcs.size, "Sources were missing")
-    assertTrue("No dependencies should be listed") { deps.isEmpty() }
+    // Filter out the kotlin-stdlib-jdk8 dependency
+    val filteredDeps = deps.filterNot {
+      it.target.contains("kotlin-stdlib")
+    }
+    assertTrue("No dependencies should be listed") { filteredDeps.isEmpty() }
   }
 
   @Test

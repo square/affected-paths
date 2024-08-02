@@ -19,8 +19,7 @@ package com.squareup.tooling.support.android
 
 import com.android.build.gradle.api.BaseVariant
 import com.squareup.tooling.models.SquareDependency
-import com.squareup.tooling.support.core.extractors.extractDependencies
-import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.extractors.extractSquareDependencies
 import org.gradle.api.Project
 import java.io.File
 
@@ -77,8 +76,7 @@ internal fun BaseVariant.extractSquareVariantConfigurationParams(
     addAll(compileConfiguration.extendsFrom.map { it.name })
   }.toTypedArray()
 
-  val deps = project.configurations.extractDependencies(*configNames)
-    .map { it.extractSquareDependency(project) }
+  val deps = project.configurations.extractSquareDependencies(project, *configNames)
 
   return srcs to deps.toSet()
 }

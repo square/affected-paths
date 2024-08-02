@@ -107,7 +107,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(debugVariant.deps.isEmpty())
+    assertTrue(debugVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     val releaseVariant = requireNotNull(result.variants["release"])
     assertTrue {
@@ -116,7 +116,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(releaseVariant.deps.isEmpty())
+    assertTrue(releaseVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     // Check test variant properties
     val debugTestVariants = debugVariant.tests
@@ -186,7 +186,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(debugVariant.deps.isEmpty())
+    assertTrue(debugVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     val releaseVariant = requireNotNull(result.variants["release"])
     assertTrue {
@@ -195,7 +195,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(releaseVariant.deps.isEmpty())
+    assertTrue(releaseVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     // Check test variant properties
     val debugTestVariants = debugVariant.tests

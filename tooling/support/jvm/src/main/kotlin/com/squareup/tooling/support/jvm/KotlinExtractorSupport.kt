@@ -19,8 +19,7 @@ package com.squareup.tooling.support.jvm
 
 import com.squareup.tooling.models.SquareDependency
 import com.squareup.tooling.models.SquareTestConfiguration
-import com.squareup.tooling.support.core.extractors.extractDependencies
-import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.extractors.extractSquareDependencies
 import com.squareup.tooling.support.core.models.SquareTestConfiguration
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
@@ -33,10 +32,11 @@ internal fun KotlinSourceSet.extractSquareTestConfiguration(
 ): SquareTestConfiguration {
   return SquareTestConfiguration(
     srcs = kotlin.sourceDirectories.map { it.toRelativeString(project.projectDir) }.toSet(),
-    deps = project.configurations.extractDependencies(
+    deps = project.configurations.extractSquareDependencies(
+      project,
       implementationMetadataConfigurationName,
       compileOnlyMetadataConfigurationName
-    ).map { it.extractSquareDependency(project) }.toSet()
+    ).toSet()
   )
 }
 
@@ -78,8 +78,7 @@ internal fun KotlinSourceSet.extractSquareVariantConfigurationParams(
     )
   }.toTypedArray()
 
-  val result = project.configurations.extractDependencies(*configNames)
-    .map { it.extractSquareDependency(project) }.toList()
+  val result = project.configurations.extractSquareDependencies(project,*configNames).toList()
   deps.addAll(result)
 
   return srcs to deps

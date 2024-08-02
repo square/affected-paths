@@ -18,8 +18,7 @@
 package com.squareup.tooling.support.jvm
 
 import com.squareup.tooling.models.SquareDependency
-import com.squareup.tooling.support.core.extractors.extractDependencies
-import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.extractors.extractSquareDependencies
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 
@@ -67,10 +66,7 @@ internal fun SourceSet.extractSquareVariantConfigurationParams(
     )
   }.toTypedArray()
 
-  deps.addAll(
-    project.configurations.extractDependencies(*configNames)
-      .map { it.extractSquareDependency(project) }
-  )
+  deps.addAll(project.configurations.extractSquareDependencies(project, *configNames))
 
   return srcs to deps
 }

@@ -292,7 +292,10 @@ class AffectedPathsTest {
         val result = analyzer.analyze()
 
         assertContentEquals(listOf("build2/foobar", "app", "library"), result.projectMap.keys)
-        assertContentEquals(listOf("build2/foobar"), result.affectedResults.flatMap { it.affectedProjectPaths }.distinct())
+        assertContentEquals(
+            listOf("app", "app:debug:debugUnitTest", "build2/foobar", "app:release:releaseUnitTest"),
+            result.affectedResults.flatMap { it.affectedProjectPaths }.distinct()
+        )
     }
 
     @Test

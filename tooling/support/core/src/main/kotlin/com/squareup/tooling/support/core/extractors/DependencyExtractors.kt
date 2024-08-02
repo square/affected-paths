@@ -20,20 +20,73 @@ package com.squareup.tooling.support.core.extractors
 import com.squareup.tooling.models.SquareDependency
 import com.squareup.tooling.support.core.models.SquareDependency
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.internal.artifacts.DefaultProjectComponentIdentifier
 import org.gradle.api.internal.artifacts.dependencies.AbstractExternalModuleDependency
 import org.gradle.api.internal.artifacts.dependencies.AbstractModuleDependency
 
-// Extracts Gradle Dependency objects from the given configurations
-public fun ConfigurationContainer.extractDependencies(
+public fun ConfigurationContainer.extractSquareDependencies(
+  project: Project,
   vararg configurationNames: String
-): Sequence<Dependency> {
-  return configurationNames.asSequence().flatMap { configurationName ->
-    getByName(configurationName).allDependencies.asSequence()
-  }
+): Sequence<SquareDependency> {
+  return configurationNames.asSequence()
+    .map { configurationName -> getByName(configurationName) }
+    .flatMap { configuration ->
+      sequence {
+        yieldAll(configuration.extractDependencies()
+          .map { it.extractSquareDependency(project) })
+        yieldAll(configuration.extractResolvedProjectDependencies())
+      }
+    }
 }
+
+/**
+ * Extracts Gradle Dependency objects from the given configurations
+ */
+public fun Configuration.extractDependencies(): Sequence<Dependency> {
+  return allDependencies.asSequence()
+}
+
+/**
+ * Extracts project dependencies from the resolved artifacts of the configuration.
+ *
+ * In cases where an included build is used (e.g., through `includeBuild`), project dependencies
+ * may not appear in the standard `Configuration.allDependencies` list. Instead, they are
+ * resolved during the configuration resolution process.
+ *
+ * It only works if the configuration can be resolved (`isCanBeResolved` is true), which excludes
+ * configurations like `compileOnly`.
+ */
+public fun Configuration.extractResolvedProjectDependencies(): Sequence<SquareDependency> {
+  if (!isCanBeResolved) return emptySequence()
+
+  val resolutionResult = incoming.resolutionResult
+  val allDependencies = resolutionResult.allDependencies
+  val directDependencies = resolutionResult.root.dependencies.toSet()
+
+  return allDependencies.asSequence()
+    .mapNotNull { it as? ResolvedDependencyResult }
+    .mapNotNull { resolvedDependencyResult ->
+      val identifier = resolvedDependencyResult.selected.id as? DefaultProjectComponentIdentifier
+      identifier?.let {
+        if (it.identityPath.path != ":") {
+          val path = gradlePathToFilePath(it.identityPath.path)
+          val isTransitive = resolvedDependencyResult !in directDependencies
+          SquareDependency(
+            target = path,
+            tags = if (isTransitive) setOf("transitive") else emptySet()
+          )
+        } else {
+          null
+        }
+      }
+    }
+}
+
 
 // Converts the given Gradle Dependency into a SquareDependency use to construct the model project
 public fun Dependency.extractSquareDependency(project: Project): SquareDependency {
@@ -71,7 +124,7 @@ public fun Dependency.extractSquareDependency(project: Project): SquareDependenc
 // Meant to de-duplicate project name from target string.
 private fun Dependency.keyRelativeTo(relative: String = ""): String {
   if (this is ProjectDependency) {
-    return dependencyProject.path.replace(':', '/')
+    return gradlePathToFilePath(dependencyProject.path)
   }
   val s = group?.split(".", ":", "/") ?: emptyList()
   val result = when (s.firstOrNull()) {
@@ -79,4 +132,8 @@ private fun Dependency.keyRelativeTo(relative: String = ""): String {
     else -> s
   }
   return result.plus(name).joinToString("") { "/$it" }
+}
+
+private fun gradlePathToFilePath(path: String): String {
+  return path.replace(':', '/')
 }
