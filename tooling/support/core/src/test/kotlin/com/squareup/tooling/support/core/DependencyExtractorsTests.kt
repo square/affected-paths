@@ -18,7 +18,9 @@
 package com.squareup.tooling.support.core
 
 import com.squareup.tooling.support.core.extractors.extractDependencies
+import com.squareup.tooling.support.core.extractors.extractResolvedProjectDependencies
 import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.models.SquareDependency
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -34,7 +36,7 @@ class DependencyExtractorsTests {
     project.dependencies.add("testConfig", "com.squareup:foo")
     project.dependencies.add("testConfig", "com.squareup:bar")
 
-    val result = project.configurations.extractDependencies("testConfig").toList()
+    val result = project.configurations.getByName("testConfig").extractDependencies().toList()
 
     // Test
     assertEquals(2, result.size)
@@ -106,4 +108,35 @@ class DependencyExtractorsTests {
       return@assertTrue result.target == "/squareTest"
     }
   }
+
+  @Test
+  fun `test extractResolvedProjectDependencies() with empty project dependencies`() {
+    // Setup
+    val project = ProjectBuilder.builder().build()
+    project.configurations.create("testConfig")
+
+    // Test
+    val configuration = project.configurations.getByName("testConfig")
+
+    val result = configuration.extractResolvedProjectDependencies()
+    assertTrue(result.none(), "The result should be an empty sequence")
+  }
+
+  @Test
+  fun `test extractResolvedProjectDependencies() with resolved project dependencies`() {
+    // Setup
+    val project = ProjectBuilder.builder().build()
+    project.configurations.create("testConfig")
+    val projectDependency = ProjectBuilder.builder().withName("squareTest").withParent(project).build()
+    projectDependency.configurations.create("default")
+    project.dependencies.add("testConfig", projectDependency)
+
+    // Test
+    val configuration = project.configurations.getByName("testConfig")
+
+    val result = configuration.extractResolvedProjectDependencies()
+    assertEquals(1, result.count())
+    assertTrue(result.contains(SquareDependency(target = "/squareTest")))
+  }
+
 }
