@@ -33,13 +33,16 @@ public fun ConfigurationContainer.extractSquareDependencies(
   project: Project,
   vararg configurationNames: String
 ): Sequence<SquareDependency> {
+  val useIncludeBuild = project.findProperty("useIncludeBuild") == "true"
   return configurationNames.asSequence()
     .map { configurationName -> getByName(configurationName) }
     .flatMap { configuration ->
       sequence {
         yieldAll(configuration.extractDependencies()
           .map { it.extractSquareDependency(project) })
-        yieldAll(configuration.extractResolvedProjectDependencies())
+        if (useIncludeBuild) {
+          yieldAll(configuration.extractResolvedProjectDependencies())
+        }
       }
     }
 }

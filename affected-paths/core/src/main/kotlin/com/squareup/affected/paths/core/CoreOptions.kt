@@ -120,6 +120,7 @@ public data class CoreOptions @JvmOverloads constructor(
 
   internal val gradleArgs: List<String> = buildList {
     addAll(customGradleFlags)
+    add("-PuseIncludeBuild=$useIncludeBuild")
     if (autoInjectPlugin) {
       add("-I")
       add(
