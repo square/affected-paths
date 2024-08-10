@@ -342,6 +342,66 @@ class SquareProjectModelBuilderTest {
   }
 
   @Test
+  fun `Ensure dependency substitution rules are accounted for during model building`() {
+    val projectModelBuilder = SquareProjectModelBuilder()
+
+    val rootProject = ProjectBuilder
+      .builder()
+      .withProjectDir(temporaryFolder)
+      .withName("com.squareup.test")
+      .build()
+
+    ProjectBuilder
+      .builder()
+      .withName("test-lib")
+      .withProjectDir(generateTestBuild(File(rootProject.projectDir, "test-lib")))
+      .withParent(rootProject)
+      .build()
+
+    // Add in the ":app" project
+    val app = ProjectBuilder
+      .builder()
+      .withName("app")
+      .withProjectDir(generateApplicationBuild(File(rootProject.projectDir, "app")))
+      .withParent(rootProject)
+      .build()
+
+    app.buildFile.appendText("""
+      
+      dependencies {
+        implementation 'org.blah:blah'
+      }
+    """.trimIndent())
+
+    app.buildscript.configurations.all { config ->
+      config.resolutionStrategy.dependencySubstitution { substitution ->
+        substitution.substitute(substitution.module("org.blah:blah"))
+          .using(substitution.project(":test-lib"))
+      }
+    }
+
+    app.forceEvaluate()
+
+    val result = projectModelBuilder.buildAll(SquareProject::class.java.name, app) as SquareProject
+
+    // Check SquareProject properties
+    assertEquals("app", result.name)
+    assertEquals("com.squareup.test", result.namespace)
+    assertEquals("app", result.pathToProject)
+    assertEquals("android-app", result.pluginUsed)
+
+    assertTrue("Dependencies were not substituted") {
+      result.variants.values.all { configuration ->
+        configuration.deps.any { dep ->
+          dep.target == "/test-lib"
+        } && configuration.deps.none { dep ->
+          dep.target == "@maven://org.blah:blah"
+        }
+      }
+    }
+  }
+
+  @Test
   fun `Do not throw exception if a non-Java or non-Android plugin is used`() {
     val projectModelBuilder = SquareProjectModelBuilder()
 
