@@ -93,7 +93,7 @@ public fun Dependency.extractSquareDependency(project: Project): SquareDependenc
   return when (this) {
     // Used by maven dependencies.
     is AbstractExternalModuleDependency -> {
-      SquareDependency(target = "@maven://${group ?: "undefined"}:$name")
+      SquareDependency(target = "@maven://${group}:$name")
     }
 
     // Meant to capture non-project dependencies, but in reality captures project dependencies.
