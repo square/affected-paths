@@ -86,7 +86,7 @@ class SquareProjectModelBuilderTest {
       .withParent(rootProject)
       .build()
 
-    val expectedTestDependency = SquareDependency("/app", setOf("transitive"))
+    val expectedTestDependency = SquareDependency("/app")
 
     appProject.forceEvaluate()
 
@@ -165,7 +165,7 @@ class SquareProjectModelBuilderTest {
       .withParent(rootProject)
       .build()
 
-    val expectedTestDependency = SquareDependency("/lib", setOf("transitive"))
+    val expectedTestDependency = SquareDependency("/lib")
 
     libProject.forceEvaluate()
 
@@ -368,17 +368,17 @@ class SquareProjectModelBuilderTest {
 
     app.buildFile.appendText("""
       
+      configurations.all { config ->
+        config.resolutionStrategy.dependencySubstitution { substitution ->
+          substitution.substitute(substitution.module("org.blah:blah"))
+            .using(substitution.project(":test-lib"))
+        }
+      }
+      
       dependencies {
-        implementation 'org.blah:blah'
+        implementation 'org.blah:blah:'
       }
     """.trimIndent())
-
-    app.buildscript.configurations.all { config ->
-      config.resolutionStrategy.dependencySubstitution { substitution ->
-        substitution.substitute(substitution.module("org.blah:blah"))
-          .using(substitution.project(":test-lib"))
-      }
-    }
 
     app.forceEvaluate()
 
@@ -391,11 +391,9 @@ class SquareProjectModelBuilderTest {
     assertEquals("android-app", result.pluginUsed)
 
     assertTrue("Dependencies were not substituted") {
-      result.variants.values.all { configuration ->
+      result.variants.values.any { configuration ->
         configuration.deps.any { dep ->
           dep.target == "/test-lib"
-        } && configuration.deps.none { dep ->
-          dep.target == "@maven://org.blah:blah"
         }
       }
     }

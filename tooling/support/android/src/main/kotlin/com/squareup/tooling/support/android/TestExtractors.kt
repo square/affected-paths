@@ -21,7 +21,7 @@ import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
 import com.squareup.tooling.models.SquareTestConfiguration
-import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.extractors.extractResolvedProjectDependencies
 import com.squareup.tooling.support.core.models.SquareTestConfiguration
 import org.gradle.api.Project
 
@@ -55,6 +55,6 @@ private fun BaseVariant.extractSquareTestConfiguration(project: Project): Square
     }.map { it.toRelativeString(project.projectDir) }
   return SquareTestConfiguration(
     srcs = dirs.toSet(),
-    deps = compileConfiguration.allDependencies.map { it.extractSquareDependency(project) }.toSet()
+    deps = compileConfiguration.extractResolvedProjectDependencies(project).toSet()
   )
 }

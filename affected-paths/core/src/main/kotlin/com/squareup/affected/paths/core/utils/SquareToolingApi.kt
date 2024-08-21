@@ -42,6 +42,7 @@ internal class SquareBuildAction(
     val canRunParallel = controller.getCanQueryProjectModelInParallel(SquareProject::class.java)
 
     val actions = buildList {
+      addAll(controller.buildModel.projects.asSequence().map { project -> ProjectBuildAction(project) })
       // Include any builds along with the root build
       controller.buildModel.includedBuilds.forEach { build ->
         addAll(

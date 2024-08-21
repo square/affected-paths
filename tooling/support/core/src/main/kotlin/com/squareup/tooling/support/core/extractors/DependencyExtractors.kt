@@ -25,11 +25,14 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentSelector
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
 import org.gradle.api.internal.artifacts.dependencies.AbstractExternalModuleDependency
 import org.gradle.api.internal.artifacts.dependencies.AbstractModuleDependency
-import org.jetbrains.kotlin.util.prefixIfNot
+import org.gradle.util.GradleVersion
 
 /**
  * Extracts SquareDependency objects from the given configurations
@@ -64,24 +67,61 @@ public fun Configuration.extractResolvedProjectDependencies(project: Project): S
   val allDependencies = resolutionResult.allDependencies
   val directDependencies = resolutionResult.root.dependencies.toSet()
 
-  return allDependencies.asSequence().filterIsInstance<ResolvedDependencyResult>()
-    .map { resolvedDependencyResult ->
-      val id = resolvedDependencyResult.selected.id
-      return@map when (id) {
-        is ProjectComponentIdentifier -> {
-          val path = gradlePathToFilePath(id.identityPath)
-          val isTransitive = resolvedDependencyResult !in directDependencies
-          SquareDependency(
-            target = path,
-            tags = if (isTransitive) setOf("transitive") else emptySet()
-          )
+  return allDependencies.asSequence()
+    .map { dependencyResult ->
+      when (dependencyResult) {
+          is ResolvedDependencyResult -> {
+            return@map when (val id = dependencyResult.selected.id) {
+              is ProjectComponentIdentifier -> {
+                val path = gradlePathToFilePath(id.identityPath)
+                val isTransitive = dependencyResult !in directDependencies
+                SquareDependency(
+                  target = path,
+                  tags = if (isTransitive) setOf("transitive") else emptySet()
+                )
+              }
+
+              is ModuleComponentIdentifier -> {
+                @Suppress("UselessCallOnNotNull")
+                SquareDependency(
+                  target = "@maven://${id.moduleIdentifier.group.orEmpty().ifBlank { "undefined" }}:${id.moduleIdentifier.name}"
+                )
+              }
+
+              else -> {
+                println("WARNING: Unknown dep type $javaClass")
+                SquareDependency(target = id.displayName)
+              }
+            }
+          }
+
+        is UnresolvedDependencyResult -> {
+          return@map when (val id = dependencyResult.requested) {
+            is ProjectComponentSelector -> {
+              val path = gradlePathToFilePath(id.identityPath)
+              val isTransitive = dependencyResult !in directDependencies
+              SquareDependency(
+                target = path,
+                tags = if (isTransitive) setOf("transitive") else emptySet()
+              )
+            }
+
+            is ModuleComponentSelector -> {
+              @Suppress("UselessCallOnNotNull")
+              SquareDependency(
+                target = "@maven://${id.moduleIdentifier.group.orEmpty().ifBlank { "undefined" }}:${id.moduleIdentifier.name}"
+              )
+            }
+
+            else -> {
+              println("WARNING: Unknown dep type $javaClass")
+              SquareDependency(target = id.displayName)
+            }
+          }
         }
-        is ModuleComponentIdentifier -> {
-          SquareDependency(target = "@maven://${id.moduleIdentifier.group}:${id.moduleIdentifier.name}")
-        }
+
         else -> {
-          println("WARNING: Unknown dep type $javaClass")
-          SquareDependency(target = id.displayName)
+          return@map SquareDependency("unknown")
         }
       }
     }
@@ -89,11 +129,12 @@ public fun Configuration.extractResolvedProjectDependencies(project: Project): S
 
 
 // Converts the given Gradle Dependency into a SquareDependency use to construct the model project
-public fun Dependency.extractSquareDependency(project: Project): SquareDependency {
+private fun Dependency.extractSquareDependency(project: Project): SquareDependency {
   return when (this) {
     // Used by maven dependencies.
     is AbstractExternalModuleDependency -> {
-      SquareDependency(target = "@maven://${group}:$name")
+      @Suppress("UselessCallOnNotNull")
+      SquareDependency(target = "@maven://${group.orEmpty().ifBlank { "undefined" }}:$name")
     }
 
     // Meant to capture non-project dependencies, but in reality captures project dependencies.
@@ -135,9 +176,24 @@ private fun Dependency.keyRelativeTo(relative: String = ""): String {
 }
 
 private fun gradlePathToFilePath(path: String): String {
-  return path.replace(':', '/')
+  val filePath = path.replace(':', '/')
+  return if (filePath.startsWith('/')) filePath else "/$filePath"
 }
 
 private val ProjectComponentIdentifier.identityPath: String
-  get() = projectPath.prefixIfNot(build.buildPath)
+  get() {
+    return if (GradleVersion.current() >= GradleVersion.version("8.2")) {
+      if (projectPath.startsWith(build.buildPath)) projectPath else "${build.buildPath}$projectPath"
+    } else {
+      if (projectPath.startsWith(build.name)) projectPath else "${build.name}$projectPath"
+    }
+  }
 
+private val ProjectComponentSelector.identityPath: String
+  get() {
+    return if (GradleVersion.current() >= GradleVersion.version("8.2")) {
+      if (projectPath.startsWith(buildPath)) projectPath else "$buildPath$projectPath"
+    } else {
+      if (projectPath.startsWith(buildName)) projectPath else "$buildName$projectPath"
+    }
+  }

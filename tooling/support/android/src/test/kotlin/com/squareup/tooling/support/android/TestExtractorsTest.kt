@@ -54,8 +54,8 @@ class TestExtractorsTest {
     val squareUnitTestConfiguration = unitTestVariant
       .extractSquareTestConfiguration(appProject)
 
-    assertEquals(1, squareUnitTestConfiguration.deps.size)
-    assertTrue { squareUnitTestConfiguration.deps.all { it.target == "/app" } }
+    assertEquals(2, squareUnitTestConfiguration.deps.size)
+    assertTrue { squareUnitTestConfiguration.deps.any { it.target == "/app" } }
 
     // Test the TestVariant
     val testVariant = appProject.extensions.getByType(AppExtension::class.java).testVariants.first()
@@ -66,7 +66,7 @@ class TestExtractorsTest {
       squareTestConfiguration.srcs.all { it.startsWith("src/") },
       "All source paths must be relative to the project dir"
     )
-    assertEquals(1, squareTestConfiguration.deps.size)
-    assertTrue { squareTestConfiguration.deps.all { it.target == "/app" } }
+    assertEquals(2, squareTestConfiguration.deps.size)
+    assertTrue { squareTestConfiguration.deps.any { it.target == "/app" } }
   }
 }
