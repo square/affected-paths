@@ -24,26 +24,24 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
-import org.gradle.api.internal.artifacts.DefaultProjectComponentIdentifier
 import org.gradle.api.internal.artifacts.dependencies.AbstractExternalModuleDependency
 import org.gradle.api.internal.artifacts.dependencies.AbstractModuleDependency
+import org.jetbrains.kotlin.util.prefixIfNot
 
+/**
+ * Extracts SquareDependency objects from the given configurations
+ */
 public fun ConfigurationContainer.extractSquareDependencies(
   project: Project,
   vararg configurationNames: String
 ): Sequence<SquareDependency> {
-  val useIncludeBuild = project.findProperty("useIncludeBuild") == "true"
   return configurationNames.asSequence()
     .map { configurationName -> getByName(configurationName) }
     .flatMap { configuration ->
-      sequence {
-        yieldAll(configuration.extractDependencies()
-          .map { it.extractSquareDependency(project) })
-        if (useIncludeBuild) {
-          yieldAll(configuration.extractResolvedProjectDependencies())
-        }
-      }
+      configuration.extractResolvedProjectDependencies(project)
     }
 }
 
@@ -55,36 +53,35 @@ public fun Configuration.extractDependencies(): Sequence<Dependency> {
 }
 
 /**
- * Extracts project dependencies from the resolved artifacts of the configuration.
+ * Extracts dependencies from the resolved artifacts of the configuration.
  *
- * In cases where an included build is used (e.g., through `includeBuild`), project dependencies
- * may not appear in the standard `Configuration.allDependencies` list. Instead, they are
- * resolved during the configuration resolution process.
- *
- * It only works if the configuration can be resolved (`isCanBeResolved` is true), which excludes
- * configurations like `compileOnly`.
+ * If configuration is not resolvable, it will extract dependencies from the configuration itself.
  */
-public fun Configuration.extractResolvedProjectDependencies(): Sequence<SquareDependency> {
-  if (!isCanBeResolved) return emptySequence()
+public fun Configuration.extractResolvedProjectDependencies(project: Project): Sequence<SquareDependency> {
+  if (!isCanBeResolved) return extractDependencies().map { it.extractSquareDependency(project) }
 
   val resolutionResult = incoming.resolutionResult
   val allDependencies = resolutionResult.allDependencies
   val directDependencies = resolutionResult.root.dependencies.toSet()
 
-  return allDependencies.asSequence()
-    .mapNotNull { it as? ResolvedDependencyResult }
-    .mapNotNull { resolvedDependencyResult ->
-      val identifier = resolvedDependencyResult.selected.id as? DefaultProjectComponentIdentifier
-      identifier?.let {
-        if (it.identityPath.path != ":") {
-          val path = gradlePathToFilePath(it.identityPath.path)
+  return allDependencies.asSequence().filterIsInstance<ResolvedDependencyResult>()
+    .map { resolvedDependencyResult ->
+      val id = resolvedDependencyResult.selected.id
+      return@map when (id) {
+        is ProjectComponentIdentifier -> {
+          val path = gradlePathToFilePath(id.identityPath)
           val isTransitive = resolvedDependencyResult !in directDependencies
           SquareDependency(
             target = path,
             tags = if (isTransitive) setOf("transitive") else emptySet()
           )
-        } else {
-          null
+        }
+        is ModuleComponentIdentifier -> {
+          SquareDependency(target = "@maven://${id.moduleIdentifier.group}:${id.moduleIdentifier.name}")
+        }
+        else -> {
+          println("WARNING: Unknown dep type $javaClass")
+          SquareDependency(target = id.displayName)
         }
       }
     }
@@ -140,3 +137,7 @@ private fun Dependency.keyRelativeTo(relative: String = ""): String {
 private fun gradlePathToFilePath(path: String): String {
   return path.replace(':', '/')
 }
+
+private val ProjectComponentIdentifier.identityPath: String
+  get() = projectPath.prefixIfNot(build.buildPath)
+

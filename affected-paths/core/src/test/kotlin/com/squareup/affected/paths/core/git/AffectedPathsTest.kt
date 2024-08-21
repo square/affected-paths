@@ -206,8 +206,7 @@ class AffectedPathsTest {
         val analyzer = CoreAnalyzer(
             CoreOptions(
                 directory = build1,
-                changedFiles = listOf("library/build.gradle"),
-                useIncludeBuild = false
+                changedFiles = listOf("library/build.gradle")
             )
         )
 

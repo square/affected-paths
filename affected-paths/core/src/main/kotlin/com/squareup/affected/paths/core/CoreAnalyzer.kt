@@ -101,10 +101,7 @@ public class CoreAnalyzer @JvmOverloads constructor(private val coreOptions: Cor
           ensureActive()
 
           val actionExecutor = projectConnection.action(
-            SquareBuildAction(
-              coreOptions.allowGradleParallel,
-              coreOptions.useIncludeBuild
-            )
+            SquareBuildAction(coreOptions.allowGradleParallel)
           )
           actionExecutor.withCancellationToken(cancellationTokenSource.token())
           if (coreOptions.useBuildScan) {
