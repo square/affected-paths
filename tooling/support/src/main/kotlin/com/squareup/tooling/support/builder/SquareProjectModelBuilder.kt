@@ -42,6 +42,7 @@ private class SquareProjectModelBuilderImpl : SquareProjectModelBuilder {
     return modelName == SquareProject::class.java.name
   }
 
+  // The `Any?` return type is valid. Ignore the error.
   override fun buildAll(modelName: String, project: Project): Any? {
     if (modelName == SquareProject::class.java.name) {
       return extractors.firstNotNullOfOrNull { it.extractSquareProject(project) }

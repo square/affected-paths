@@ -54,6 +54,7 @@ internal fun SourceSet.extractSquareVariantConfigurationParams(
     }
   }
 
+  @Suppress("UselessCallOnNotNull", "RemoveExplicitTypeArguments")
   val configNames = buildList<String> {
     add(compileClasspathConfigurationName)
     addAll(
