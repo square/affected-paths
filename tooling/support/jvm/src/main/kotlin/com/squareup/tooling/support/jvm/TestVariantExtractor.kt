@@ -18,8 +18,7 @@
 package com.squareup.tooling.support.jvm
 
 import com.squareup.tooling.models.SquareTestConfiguration
-import com.squareup.tooling.support.core.extractors.extractDependencies
-import com.squareup.tooling.support.core.extractors.extractSquareDependency
+import com.squareup.tooling.support.core.extractors.extractSquareDependencies
 import com.squareup.tooling.support.core.models.SquareTestConfiguration
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
@@ -28,7 +27,9 @@ import org.gradle.api.tasks.SourceSet
 internal fun SourceSet.extractSquareTestConfiguration(project: Project): SquareTestConfiguration {
   return SquareTestConfiguration(
     srcs = allSource.sourceDirectories.map { it.toRelativeString(project.projectDir) }.toSet(),
-    deps = project.configurations.extractDependencies(compileClasspathConfigurationName)
-      .map { it.extractSquareDependency(project) }.toSet()
+    deps = project.configurations.extractSquareDependencies(
+      project,
+      compileClasspathConfigurationName
+    ).toSet()
   )
 }

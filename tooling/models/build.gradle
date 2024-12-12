@@ -2,7 +2,3 @@ plugins {
     id 'square-lib'
     id 'square-publishing'
 }
-
-dependencies {
-    compileOnly(gradleApi())
-}

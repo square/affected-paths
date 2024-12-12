@@ -86,7 +86,7 @@ class SquareProjectModelBuilderTest {
       .withParent(rootProject)
       .build()
 
-    val expectedTestDependency = SquareDependency("/app", setOf("transitive"))
+    val expectedTestDependency = SquareDependency("/app")
 
     appProject.forceEvaluate()
 
@@ -107,7 +107,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(debugVariant.deps.isEmpty())
+    assertTrue(debugVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     val releaseVariant = requireNotNull(result.variants["release"])
     assertTrue {
@@ -116,7 +116,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(releaseVariant.deps.isEmpty())
+    assertTrue(releaseVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     // Check test variant properties
     val debugTestVariants = debugVariant.tests
@@ -165,7 +165,7 @@ class SquareProjectModelBuilderTest {
       .withParent(rootProject)
       .build()
 
-    val expectedTestDependency = SquareDependency("/lib", setOf("transitive"))
+    val expectedTestDependency = SquareDependency("/lib")
 
     libProject.forceEvaluate()
 
@@ -186,7 +186,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(debugVariant.deps.isEmpty())
+    assertTrue(debugVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     val releaseVariant = requireNotNull(result.variants["release"])
     assertTrue {
@@ -195,7 +195,7 @@ class SquareProjectModelBuilderTest {
             ANDROID_SRC_DIRECTORY_PATHS.map { "src/main/$it" }
       )
     }
-    assertTrue(releaseVariant.deps.isEmpty())
+    assertTrue(releaseVariant.deps.filterNot { it.target.contains("kotlin-stdlib") }.isEmpty())
 
     // Check test variant properties
     val debugTestVariants = debugVariant.tests
@@ -339,6 +339,64 @@ class SquareProjectModelBuilderTest {
     // Check test variant properties
     val debugTestVariants = debugVariant.tests
     assertTrue(debugTestVariants.keys.isEmpty())
+  }
+
+  @Test
+  fun `Ensure dependency substitution rules are accounted for during model building`() {
+    val projectModelBuilder = SquareProjectModelBuilder()
+
+    val rootProject = ProjectBuilder
+      .builder()
+      .withProjectDir(temporaryFolder)
+      .withName("com.squareup.test")
+      .build()
+
+    ProjectBuilder
+      .builder()
+      .withName("test-lib")
+      .withProjectDir(generateTestBuild(File(rootProject.projectDir, "test-lib")))
+      .withParent(rootProject)
+      .build()
+
+    // Add in the ":app" project
+    val app = ProjectBuilder
+      .builder()
+      .withName("app")
+      .withProjectDir(generateApplicationBuild(File(rootProject.projectDir, "app")))
+      .withParent(rootProject)
+      .build()
+
+    app.buildFile.appendText("""
+      
+      configurations.all { config ->
+        config.resolutionStrategy.dependencySubstitution { substitution ->
+          substitution.substitute(substitution.module("org.blah:blah"))
+            .using(substitution.project(":test-lib"))
+        }
+      }
+      
+      dependencies {
+        implementation 'org.blah:blah:'
+      }
+    """.trimIndent())
+
+    app.forceEvaluate()
+
+    val result = projectModelBuilder.buildAll(SquareProject::class.java.name, app) as SquareProject
+
+    // Check SquareProject properties
+    assertEquals("app", result.name)
+    assertEquals("com.squareup.test", result.namespace)
+    assertEquals("app", result.pathToProject)
+    assertEquals("android-app", result.pluginUsed)
+
+    assertTrue("Dependencies were not substituted") {
+      result.variants.values.any { configuration ->
+        configuration.deps.any { dep ->
+          dep.target == "/test-lib"
+        }
+      }
+    }
   }
 
   @Test

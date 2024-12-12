@@ -67,9 +67,6 @@ public data class CoreOptions @JvmOverloads constructor(
   /** Auto-injects the "com.squareup.tooling" plugin to all projects in the build */
   val autoInjectPlugin: Boolean = true,
 
-  /** Include any "includeBuild" builds from the current build */
-  val useIncludeBuild: Boolean = true,
-
   /** Gradle distribution file to use */
   val gradleDistributionPath: Path? = null,
 

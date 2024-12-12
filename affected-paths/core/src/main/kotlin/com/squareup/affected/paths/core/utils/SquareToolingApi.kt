@@ -35,36 +35,24 @@ private class ProjectBuildAction(private val project: Model) : BuildAction<Squar
  * Base build action to gather all [SquareProject] from the current build.
  */
 internal class SquareBuildAction(
-  private val allowParallelConfiguration: Boolean,
-  private val useIncludeBuild: Boolean,
+  private val allowParallelConfiguration: Boolean
 ) : BuildAction<List<SquareProject>> {
   override fun execute(controller: BuildController): List<SquareProject> {
     // Run the ProjectBuildAction in parallel, if we can
     val canRunParallel = controller.getCanQueryProjectModelInParallel(SquareProject::class.java)
 
     val actions = buildList {
+      addAll(controller.buildModel.projects.asSequence().map { project -> ProjectBuildAction(project) })
       // Include any builds along with the root build
-      if (useIncludeBuild) {
-        controller.buildModel.includedBuilds.forEach { build ->
-          addAll(
-            build.projects // All projects included in the "settings.gradle" file of all builds
-              .asSequence()
-              .map { project ->
-                return@map ProjectBuildAction(project)
-              }
-          )
-        }
+      controller.buildModel.includedBuilds.forEach { build ->
+        addAll(
+          build.projects // All projects included in the "settings.gradle" file of all builds
+            .asSequence()
+            .map { project ->
+              return@map ProjectBuildAction(project)
+            }
+        )
       }
-
-      // The "BuildModel" is the Gradle build after evaluating the "settings.gradle" file
-      addAll(
-        controller.buildModel
-          .projects // All projects included in the "settings.gradle" file
-          .asSequence()
-          .map { project ->
-            return@map ProjectBuildAction(project)
-          }.toList()
-      )
     }
 
     if (actions.isEmpty()) return emptyList()

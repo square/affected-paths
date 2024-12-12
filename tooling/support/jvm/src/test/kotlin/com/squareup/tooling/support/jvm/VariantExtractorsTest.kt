@@ -106,7 +106,11 @@ class VariantExtractorsTest {
 
     val (srcs, deps) = kotlinSourceSet.extractSquareVariantConfigurationParams(appProject, "main")
     assertTrue(srcs.containsAll(listOf("src/main/java", "src/main/kotlin")))
-    assertTrue("No dependencies should be listed") { deps.isEmpty() }
+    // Filter out the kotlin-stdlib-jdk8 dependency
+    val filteredDeps = deps.filterNot {
+      it.target.contains("kotlin-stdlib")
+    }
+    assertTrue("No dependencies should be listed") { filteredDeps.isEmpty() }
   }
 
   @Test
