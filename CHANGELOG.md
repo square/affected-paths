@@ -1,5 +1,8 @@
 ## Unreleased
+
+## v0.1.4
 - `affected-paths-core`: Add in flag for enabling build scans on affected-paths runs
+- `affected-paths-core`: Allow better control of the Gradle daemon
 
 ## v0.1.3
 - `affected-paths-core`: Fix custom Gradle flags not being properly set
