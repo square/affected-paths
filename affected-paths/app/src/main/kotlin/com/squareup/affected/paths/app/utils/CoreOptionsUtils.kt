@@ -29,10 +29,14 @@ internal fun BaseConfigurationOptions.toCoreOptions(): CoreOptions {
     allowGradleParallel = allowGradleParallel,
     initialGradleMemory = initialGradleMemory,
     maxGradleMemory = maxGradleMemory,
-    customJvmFlags = listOf("-XX:-MaxFDLimit"),
-    customGradleFlags = listOf("--stacktrace"),
+    customJvmFlags = gradleJvmFlags,
+    customGradleFlags = gradleFlags,
     autoInjectPlugin = autoInject,
     changedFiles = changedFiles,
     gradleInstallationPath = gradleInstallationPath,
+    useBuildScan = gradleBuildScan,
+    gradleDistributionPath = gradleDistributionPath,
+    gradleVersion = gradleVersion,
+    gradleUserHome = gradleUserHome
   )
 }

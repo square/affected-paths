@@ -127,4 +127,48 @@ internal class BaseConfigurationOptions {
   )
   var gradleInstallationPath: Path? = null
     internal set
+
+  @Option(
+    names = ["--build-scan"],
+    description = ["Capture the Gradle build scan"]
+  )
+  var gradleBuildScan: Boolean = false
+    internal set
+
+  @Option(
+    names = ["--gradle-jvm-flags"],
+    description = ["List of JVM flags to pass to the Gradle daemon"],
+    split = " "
+  )
+  var gradleJvmFlags: List<String> = emptyList()
+    internal set
+
+  @Option(
+    names = ["--gradle-flags"],
+    description = ["Gradle flags to use on model queries and task runs"],
+    split = " "
+  )
+  var gradleFlags: List<String> = emptyList()
+    internal set
+
+  @Option(
+    names = ["--distribution-path"],
+    description = ["Gradle distribution path"]
+  )
+  var gradleDistributionPath: Path? = null
+    internal set
+
+  @Option(
+    names = ["--gradle-version"],
+    description = ["Gradle version to use"]
+  )
+  var gradleVersion: String? = null
+    internal set
+
+  @Option(
+    names = ["--gradle-user-home"],
+    description = ["Gradle user home path to use"]
+  )
+  var gradleUserHome: Path? = null
+    internal set
 }
