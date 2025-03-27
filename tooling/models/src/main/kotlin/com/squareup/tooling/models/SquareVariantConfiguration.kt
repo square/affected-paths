@@ -32,6 +32,6 @@ public interface SquareVariantConfiguration : Serializable {
   public val tests: Map<String, SquareTestConfiguration>
 
   public companion object {
-    private const val serialVersionUid: Long = 1L
+    private const val serialVersionUID: Long = 1L
   }
 }
