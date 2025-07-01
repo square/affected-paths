@@ -57,7 +57,7 @@ class VariantExtractorsTest {
   }
 
   @Test
-  fun `Test BaseVariant_extractSquareVariantConfigurationParams() extension with plugin`() {
+  fun `Test BaseVariant_extractSquareVariantConfigurationParams() extension with sqldelight plugin`() {
     val appProject = ProjectBuilder
       .builder()
       .withProjectDir(generateApplicationBuild(temporaryFolder))
@@ -84,6 +84,36 @@ class VariantExtractorsTest {
     assertContains(srcs, "src/main/sqldelight")
     // Dependency added by SqlDelight
     assertContains(deps, SquareDependency("@maven://com.squareup.sqldelight:runtime-jvm"))
+  }
+
+  @Test
+  fun `Test BaseVariant_extractSquareVariantConfigurationParams() extension with sqldelight v2 plugin`() {
+    val appProject = ProjectBuilder
+      .builder()
+      .withProjectDir(generateApplicationBuild(temporaryFolder))
+      .build()
+
+    appProject.plugins.apply("app.cash.sqldelight")
+
+    // Make directories for sqldelight for testing.
+    appProject.projectDir.resolve("src").resolve("main").resolve("sqldelight").mkdirs()
+
+    appProject.forceEvaluate()
+
+    val variant = appProject.extensions.getByType(AppExtension::class.java).applicationVariants.first()
+
+    val (srcs, deps) = variant.extractSquareVariantConfigurationParams(appProject, emptyMap())
+
+    assertTrue(
+      srcs.all { it.startsWith("src/") },
+      "All source paths must be relative to the project dir"
+    )
+    // Main and debug sources are present
+    assertEquals(25, srcs.size, "Sources were missing")
+    // Ensure sqldelight sources are included
+    assertContains(srcs, "src/main/sqldelight")
+    // Dependency added by SqlDelight
+    assertContains(deps, SquareDependency("@maven://app.cash.sqldelight:runtime"))
   }
 
   @Test

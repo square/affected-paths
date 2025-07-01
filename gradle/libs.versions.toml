@@ -10,6 +10,7 @@ gradleTAPI = "7.4.2"
 agp = "7.4.2"
 
 sqldelight = "1.5.4"
+sqldelight2 = "2.0.2"
 
 picocli = "4.7.0"
 
@@ -53,6 +54,7 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 
 ## SqlDelight
 sqldelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+sqldelight2 = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight2" }
 
 ## Dependency Injector
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }

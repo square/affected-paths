@@ -15,4 +15,5 @@ dependencies {
     testImplementation(gradleApi())
     testImplementation(libs.kotlin.gradle.plugin)
     testImplementation(libs.sqldelight)
+    testImplementation(libs.sqldelight2)
 }

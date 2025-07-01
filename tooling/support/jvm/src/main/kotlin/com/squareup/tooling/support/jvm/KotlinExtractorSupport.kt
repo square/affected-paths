@@ -50,7 +50,10 @@ internal fun KotlinSourceSet.extractSquareVariantConfigurationParams(
 
   kotlin.sourceDirectories.mapTo(srcs) { it.toRelativeString(project.projectDir) }
 
-  if (project.plugins.hasPlugin("com.squareup.sqldelight")) {
+  if (
+    project.plugins.hasPlugin("com.squareup.sqldelight")
+      || project.plugins.hasPlugin("app.cash.sqldelight")
+  ) {
     val aliasFile = project.projectDir
       .resolve("src")
       .resolve(alias)

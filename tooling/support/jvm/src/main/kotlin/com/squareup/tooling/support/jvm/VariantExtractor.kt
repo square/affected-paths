@@ -34,7 +34,10 @@ internal fun SourceSet.extractSquareVariantConfigurationParams(
   allSource.sourceDirectories.mapTo(srcs) { it.toRelativeString(project.projectDir) }
 
   // SqlDelight doesn't add src/*/sqldelight to the source sets, but changes to those files can affect other projects
-  if (project.plugins.hasPlugin("com.squareup.sqldelight")) {
+  if (
+    project.plugins.hasPlugin("com.squareup.sqldelight")
+      || project.plugins.hasPlugin("app.cash.sqldelight")
+  ) {
     // Handles differing builds (release/debug)
     val aliasFile = project.projectDir
       .resolve("src")

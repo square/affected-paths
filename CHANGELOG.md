@@ -1,5 +1,9 @@
 ## Unreleased
 
+## v0.1.5
+- `tooling-support`: Support SqlDelight 2.x
+- `affected-paths-core`: Minimum JDK version is now 17
+
 ## v0.1.4
 - `affected-paths-core`: Add in flag for enabling build scans on affected-paths runs
 - `affected-paths-core`: Allow better control of the Gradle daemon

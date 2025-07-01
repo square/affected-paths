@@ -65,7 +65,7 @@ class VariantExtractorsTest {
   }
 
   @Test
-  fun `Test SourceSet_extractSquareVariantConfigurationParams() extension with plugins`() {
+  fun `Test SourceSet_extractSquareVariantConfigurationParams() extension with sqldelight`() {
     val appProject = ProjectBuilder
       .builder()
       .build()
@@ -87,6 +87,31 @@ class VariantExtractorsTest {
     )
     // Dependency added by SqlDelight
     assertContains(deps, SquareDependency("@maven://com.squareup.sqldelight:runtime-jvm"))
+  }
+
+  @Test
+  fun `Test SourceSet_extractSquareVariantConfigurationParams() extension with sqldelight v2`() {
+    val appProject = ProjectBuilder
+      .builder()
+      .build()
+
+    appProject.plugins.apply("java")
+    appProject.plugins.apply("kotlin") // Needed for SQLDelight
+    appProject.plugins.apply("app.cash.sqldelight")
+
+    // Make directories for sqldelight for testing.
+    appProject.projectDir.resolve("src").resolve("main").resolve("sqldelight").mkdirs()
+
+    appProject.forceEvaluate()
+
+    val ssc = requireNotNull(appProject.extensions.findByType(SourceSetContainer::class.java)?.findByName("main"))
+
+    val (srcs, deps) = ssc.extractSquareVariantConfigurationParams(appProject, "main")
+    assertTrue(
+      srcs.containsAll(listOf("src/main/resources", "src/main/java", "src/main/kotlin", "src/main/sqldelight"))
+    )
+    // Dependency added by SqlDelight
+    assertContains(deps, SquareDependency("@maven://app.cash.sqldelight:runtime"))
   }
 
   @Test
