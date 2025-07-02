@@ -46,7 +46,7 @@ internal fun Project.configureDokka() {
       reportUndocumented.set(true)
       platform.set(Platform.jvm)
       sourceRoots.setFrom(File("src/main"))
-      jdkVersion.set(11)
+      jdkVersion.set(17)
 
       // Set Gradle links
       externalDocumentationLink("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/")
@@ -65,18 +65,22 @@ internal fun Project.configureJVM() {
   apply<KotlinPlatformJvmPlugin>()
 
   configure<JavaPluginExtension> {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
 
   configure<KotlinJvmProjectExtension> {
     explicitApi()
     jvmToolchain {
-      languageVersion.set(JavaLanguageVersion.of(11))
+      languageVersion.set(JavaLanguageVersion.of(17))
     }
   }
 
   tasks.withType<Test> {
     useJUnitPlatform()
+
+    jvmArgs(
+      "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    )
   }
 }

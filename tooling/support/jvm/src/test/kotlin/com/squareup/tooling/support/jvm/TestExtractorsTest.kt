@@ -63,7 +63,6 @@ class TestExtractorsTest {
     val squareTestConfiguration = kotlinSourceSet.extractSquareTestConfiguration(appProject)
 
     assertTrue(squareTestConfiguration.srcs.containsAll(listOf("src/test/kotlin", "src/test/java")))
-    // For some reason, the test sources have a file collection dependency in the configuration. Just ignore it.
-    assertEquals(1, squareTestConfiguration.deps.size)
+    assertEquals(0, squareTestConfiguration.deps.size)
   }
 }
