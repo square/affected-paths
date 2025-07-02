@@ -30,7 +30,6 @@ import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin
 import org.jetbrains.kotlin.gradle.utils.notCompatibleWithConfigurationCacheCompat
 import java.io.File
 
@@ -62,7 +61,7 @@ internal fun Project.configureDokka() {
 }
 
 internal fun Project.configureJVM() {
-  apply<KotlinPlatformJvmPlugin>()
+  plugins.apply("org.jetbrains.kotlin.jvm")
 
   configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_17
