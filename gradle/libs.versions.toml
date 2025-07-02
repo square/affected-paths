@@ -21,7 +21,7 @@ koin = "3.3.0"
 
 jgit = "6.4.0.202211300538-r"
 
-vanniktech = "0.25.3"
+vanniktech = "0.33.0"
 
 [libraries]
 # Plugins
