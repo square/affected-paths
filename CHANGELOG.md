@@ -1,5 +1,8 @@
 ## Unreleased
 
+## v0.1.6
+- `tooling-support-core`: Support for Gradle 9
+
 ## v0.1.5
 - `tooling-support`: Support SqlDelight 2.x
 - `affected-paths-core`: Minimum JDK version is now 17
