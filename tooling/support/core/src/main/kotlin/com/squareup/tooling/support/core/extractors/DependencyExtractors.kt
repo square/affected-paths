@@ -71,7 +71,7 @@ public fun Dependency.extractSquareDependency(project: Project): SquareDependenc
 // Meant to de-duplicate project name from target string.
 private fun Dependency.keyRelativeTo(relative: String = ""): String {
   if (this is ProjectDependency) {
-    return dependencyProject.path.replace(':', '/')
+    return path.replace(':', '/')
   }
   val s = group?.split(".", ":", "/") ?: emptyList()
   val result = when (s.firstOrNull()) {
