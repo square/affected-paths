@@ -34,6 +34,6 @@ public interface SquareDependency : Serializable {
   public val tags: Set<String>
 
   public companion object {
-    private const val serialVersionUid: Long = 1L
+    private const val serialVersionUID: Long = 1L
   }
 }
