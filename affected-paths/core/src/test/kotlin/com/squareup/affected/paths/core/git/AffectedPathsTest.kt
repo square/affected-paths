@@ -58,7 +58,8 @@ class AffectedPathsTest {
         val analyzer = CoreAnalyzer(
             CoreOptions(
                 directory = root,
-                changedFiles = listOf("app/build.gradle")
+                changedFiles = listOf("app/build.gradle"),
+                gradleVersion = "8.14.2"
             )
         )
 
@@ -133,7 +134,8 @@ class AffectedPathsTest {
         val analyzer = CoreAnalyzer(
             CoreOptions(
                 directory = build1,
-                changedFiles = listOf("library/build.gradle")
+                changedFiles = listOf("library/build.gradle"),
+                gradleVersion = "8.14.2"
             )
         )
 
@@ -207,7 +209,8 @@ class AffectedPathsTest {
             CoreOptions(
                 directory = build1,
                 changedFiles = listOf("library/build.gradle"),
-                useIncludeBuild = false
+                useIncludeBuild = false,
+                gradleVersion = "8.14.2"
             )
         )
 
@@ -285,7 +288,8 @@ class AffectedPathsTest {
         val analyzer = CoreAnalyzer(
             CoreOptions(
                 directory = build1,
-                changedFiles = listOf("build2/foobar/build.gradle")
+                changedFiles = listOf("build2/foobar/build.gradle"),
+                gradleVersion = "8.14.2"
             )
         )
 
@@ -350,7 +354,8 @@ class AffectedPathsTest {
         val analyzer = CoreAnalyzer(
             CoreOptions(
                 directory = build,
-                changedFiles = listOf("library/foobar/build.gradle")
+                changedFiles = listOf("library/foobar/build.gradle"),
+                gradleVersion = "8.14.2"
             )
         )
 
