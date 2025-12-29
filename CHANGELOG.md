@@ -1,5 +1,8 @@
 ## Unreleased
 
+## v0.1.7
+- `tooling-support-core`: Support for Gradle 9 - correct use of `replace`
+
 ## v0.1.6
 - `tooling-support-core`: Support for Gradle 9
 
