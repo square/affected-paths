@@ -1,5 +1,8 @@
 ## Unreleased
 
+## v0.1.7
+- Align `affected-paths-core` version with a `tooling-support` that it uses
+
 ## v0.1.6
 - `tooling-support-core`: Support for Gradle 9
 
