@@ -1,6 +1,6 @@
 ## Unreleased
 
-## v0.1.8
+## v0.1.9
 - Migrate from `*MetadataConfigurationName` to `*ConfigurationName` - Kotlin 2.3.x compatibility
 
 ## v0.1.7
