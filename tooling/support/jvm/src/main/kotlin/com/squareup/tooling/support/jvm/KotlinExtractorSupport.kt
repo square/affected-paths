@@ -34,8 +34,8 @@ internal fun KotlinSourceSet.extractSquareTestConfiguration(
   return SquareTestConfiguration(
     srcs = kotlin.sourceDirectories.map { it.toRelativeString(project.projectDir) }.toSet(),
     deps = project.configurations.extractDependencies(
-      implementationMetadataConfigurationName,
-      compileOnlyMetadataConfigurationName
+      implementationConfigurationName,
+      compileOnlyConfigurationName
     ).map { it.extractSquareDependency(project) }.toSet()
   )
 }
@@ -73,10 +73,10 @@ internal fun KotlinSourceSet.extractSquareVariantConfigurationParams(
   }
 
   val configNames = buildList<String> {
-    add(implementationMetadataConfigurationName)
-    add(compileOnlyMetadataConfigurationName)
+    add(implementationConfigurationName)
+    add(compileOnlyConfigurationName)
     addAll(
-      project.configurations.getByName(implementationMetadataConfigurationName).extendsFrom
+      project.configurations.getByName(implementationConfigurationName).extendsFrom
         .orEmpty().map { it.name }
     )
   }.toTypedArray()

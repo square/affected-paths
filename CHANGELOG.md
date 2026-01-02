@@ -1,5 +1,8 @@
 ## Unreleased
 
+## v0.1.8
+- Migrate from `*MetadataConfigurationName` to `*ConfigurationName` - Kotlin 2.3.x compatibility
+
 ## v0.1.7
 - Align `affected-paths-core` version with a `tooling-support` that it uses
 
